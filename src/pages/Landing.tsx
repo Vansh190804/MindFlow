@@ -166,39 +166,87 @@ const Landing = () => {
 
       {/* What MindFlow Does Section */}
       <section className="py-20 px-6 bg-card/30">
-        <div className="container mx-auto max-w-4xl text-center space-y-12">
-          <motion.div
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
+            className="text-4xl font-bold mb-16 text-center"
           >
-            <p className="text-2xl text-foreground leading-relaxed max-w-3xl mx-auto">
-              MindFlow helps you capture everything — thoughts, links, notes, and media — and turns them into organized knowledge.
-            </p>
-          </motion.div>
+            What Makes MindFlow Different
+          </motion.h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Brain,
+                title: "Capture Everything",
+                description: "MindFlow helps you capture everything — thoughts, links, notes, and media — and turns them into organized knowledge.",
+                gradient: "from-primary/20 to-primary/5",
+                iconBg: "bg-primary/10",
+                iconColor: "text-primary"
+              },
+              {
+                icon: Sparkles,
+                title: "Effortlessly Smart",
+                description: "Your personal digital brain — elegant, fast, and effortlessly smart.",
+                gradient: "from-accent/20 to-accent/5",
+                iconBg: "bg-accent/10",
+                iconColor: "text-accent"
+              },
+              {
+                icon: Search,
+                title: "Instant Rediscovery",
+                description: "Save, search, and rediscover your ideas instantly with AI-powered tagging and structure.",
+                gradient: "from-primary/20 to-accent/10",
+                iconBg: "bg-gradient-primary",
+                iconColor: "text-white"
+              },
+            ].map((feature, idx) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: idx * 0.15,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                whileHover={{ 
+                  y: -8, 
+                  scale: 1.02,
+                  transition: { duration: 0.2 } 
+                }}
+                className={`relative p-8 rounded-3xl bg-gradient-to-br ${feature.gradient} border border-border/50 hover:border-primary/40 transition-all duration-300 overflow-hidden group cursor-pointer`}
+              >
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 blur-xl" />
+                </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <p className="text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Your personal digital brain — elegant, fast, and effortlessly smart.
-            </p>
-          </motion.div>
+                <div className="relative z-10">
+                  <motion.div 
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6 }}
+                    className={`w-16 h-16 rounded-2xl ${feature.iconBg} flex items-center justify-center mb-6 shadow-lg group-hover:shadow-glow`}
+                  >
+                    <feature.icon className={`w-8 h-8 ${feature.iconColor}`} />
+                  </motion.div>
+                  
+                  <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <p className="text-2xl text-foreground leading-relaxed max-w-3xl mx-auto">
-              Save, search, and rediscover your ideas instantly with AI-powered tagging and structure.
-            </p>
-          </motion.div>
+                {/* Decorative corner element */}
+                <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500" />
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
