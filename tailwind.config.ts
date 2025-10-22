@@ -94,8 +94,12 @@ export default {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-primary": "linear-gradient(135deg, hsl(260 95% 65%), hsl(220 90% 60%))",
-        "gradient-accent": "linear-gradient(135deg, hsl(180 100% 50%), hsl(200 90% 55%))",
+        "gradient-primary": "linear-gradient(135deg, hsl(251 100% 68%), hsl(260 85% 60%))",
+        "gradient-accent": "linear-gradient(135deg, hsl(251 100% 68%), hsl(180 100% 50%))",
+      },
+      boxShadow: {
+        "glow": "0 0 20px hsl(251 100% 68% / 0.3)",
+        "glow-lg": "0 0 40px hsl(251 100% 68% / 0.5)",
       },
     },
   },

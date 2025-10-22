@@ -1,6 +1,7 @@
-import { Brain, ArrowRight, FileText, Link2, Quote, Image as ImageIcon, Video, Sparkles, Search, Tag } from "lucide-react";
+import { Brain, ArrowRight, FileText, Link2, Quote, Image as ImageIcon, Video, Sparkles, Search, Tag, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -33,64 +34,93 @@ const Landing = () => {
       <section className="relative pt-32 pb-20 px-6">
         <div className="container mx-auto max-w-4xl text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
+          >
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm text-primary">Your personal digital brain</span>
-          </div>
+          </motion.div>
 
           {/* Headline */}
-          <h1 className="text-6xl font-bold mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-6xl font-bold mb-6"
+          >
             Collect. Think. Create.
-          </h1>
+          </motion.h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+          >
             MindFlow helps you capture everything, organize it with AI auto-tagging, and surface insights
             instantly with smart search — minimal, fast, and thoughtful.
-          </p>
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="flex items-center justify-center gap-4 mb-12 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex items-center justify-center gap-4 mb-12"
+          >
             <Button 
               size="lg"
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 transition-opacity px-8"
+              className="bg-gradient-primary text-primary-foreground hover:opacity-90 hover:shadow-glow transition-all px-8"
               onClick={() => navigate("/auth/signin")}
             >
+              <span className="mr-2">📧</span>
               Sign in with Google
             </Button>
             <Button 
               size="lg"
               variant="outline"
-              className="border-border/50 hover:border-primary/50"
+              className="border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
             >
-              <span>Explore Demo</span>
-              <ArrowRight className="ml-2 w-4 h-4" />
+              <span className="mr-2">▶</span>
+              Explore Demo
             </Button>
-          </div>
+          </motion.div>
 
           {/* Content Type Pills */}
-          <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex items-center justify-center gap-3 flex-wrap"
+          >
             {[
               { icon: FileText, label: "Notes" },
               { icon: Link2, label: "Links" },
               { icon: Quote, label: "Quotes" },
               { icon: ImageIcon, label: "Images" },
               { icon: Video, label: "Videos" },
-            ].map((type) => (
-              <div
+            ].map((type, idx) => (
+              <motion.div
                 key={type.label}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border/50 hover:border-primary/50 transition-colors"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.5 + idx * 0.05 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer"
               >
                 <type.icon className="w-4 h-4" />
                 <span className="text-sm">{type.label}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
 
         {/* Decorative gradient orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl -z-10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '1s' }} />
       </section>
 
       {/* Features Section */}
@@ -99,7 +129,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: FileText,
+                icon: Inbox,
                 title: "Capture Anything",
                 description: "Save notes, links, quotes, images, and videos in seconds. MindFlow stays out of the way so ideas keep moving.",
               },
@@ -114,71 +144,61 @@ const Landing = () => {
                 description: "Ask in natural language to find insights instantly — across everything you've saved.",
               },
             ].map((feature, idx) => (
-              <div
+              <motion.div
                 key={feature.title}
-                className="p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 animate-fade-in"
-                style={{ animationDelay: `${0.5 + idx * 0.1}s` }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="p-8 rounded-3xl bg-card border border-border hover:border-primary/30 hover:shadow-glow transition-all duration-300 group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Design Language Section */}
+      {/* What MindFlow Does Section */}
       <section className="py-20 px-6 bg-card/30">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold mb-12 text-center">Design Language — MindFlow</h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Palette */}
-            <div className="p-8 rounded-3xl bg-card border border-border/50">
-              <h3 className="text-lg font-semibold mb-4">Palette</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-background border border-border" />
-                  <span className="text-sm text-muted-foreground">Dark neutrals (background, surfaces)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-primary" />
-                  <span className="text-sm text-muted-foreground">Primary (actions)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-accent" />
-                  <span className="text-sm text-muted-foreground">Accent (highlights)</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Components */}
-            <div className="p-8 rounded-3xl bg-card border border-border/50">
-              <h3 className="text-lg font-semibold mb-4">Components</h3>
-              <div className="space-y-3">
-                <Button className="bg-gradient-primary hover:opacity-90">Button</Button>
-                <div className="px-4 py-2 rounded-full bg-accent/20 text-accent text-sm inline-block">Chip</div>
-                <div className="px-4 py-2 rounded-full border border-border/50 text-sm inline-block ml-2">Tag</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 p-8 rounded-3xl bg-card border border-border/50">
-            <h3 className="text-lg font-semibold mb-3">Typography</h3>
-            <p className="text-sm text-muted-foreground">
-              Sans-serif, geometric, calm. Base 16px for landing, headings bold with tight letter-spacing. Avoid all caps.
+        <div className="container mx-auto max-w-4xl text-center space-y-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-2xl text-foreground leading-relaxed max-w-3xl mx-auto">
+              MindFlow helps you capture everything — thoughts, links, notes, and media — and turns them into organized knowledge.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mt-8 p-8 rounded-3xl bg-card border border-border/50">
-            <h3 className="text-lg font-semibold mb-3">States</h3>
-            <p className="text-sm text-muted-foreground">
-              Hover: elevate with subtle shadow and border contrast. Active: pressed shadow. Focus: 2px outline using accent on dark surfaces.
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <p className="text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+              Your personal digital brain — elegant, fast, and effortlessly smart.
             </p>
-          </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <p className="text-2xl text-foreground leading-relaxed max-w-3xl mx-auto">
+              Save, search, and rediscover your ideas instantly with AI-powered tagging and structure.
+            </p>
+          </motion.div>
         </div>
       </section>
 
