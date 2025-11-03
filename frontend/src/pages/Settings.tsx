@@ -401,8 +401,8 @@ const Settings = () => {
                   <li>Extract the ZIP file to a folder</li>
                   <li>Go to <code className="px-1 py-0.5 bg-background rounded text-xs">chrome://extensions/</code></li>
                   <li>Enable "Developer mode" (top right)</li>
-                  <li>Click "Load unpacked" and select the extracted folder</li>
-                  <li>Sign in with your MindFlow account</li>
+                  <li>Click "Load unpacked" and select the extracted mindflow-extension folder</li>
+                  <li>Use it anywhere on the web</li>
                 </ol>
               </div>
             </div>

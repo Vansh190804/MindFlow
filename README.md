@@ -129,12 +129,12 @@ MindFlow/
 │   │   ├── modals/       # Database models
 │   │   ├── schemas/      # Pydantic schemas
 │   │   └── services/     # Business logic
+│   ├── Extension/        # Browser extension source
+│   │   ├── manifest.json # Extension configuration
+│   │   ├── background.js # Service worker
+│   │   ├── content-script.js # Page detection
+│   │   └── popup/        # Extension popup UI
 │   └── alembic/          # Database migrations
-├── Extension/             # Browser extension
-│   ├── manifest.json     # Extension configuration
-│   ├── background.js     # Service worker
-│   ├── content-script.js # Page detection
-│   └── popup/            # Extension popup UI
 └── public/               # Static assets
 ```
 

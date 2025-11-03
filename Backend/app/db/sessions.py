@@ -6,7 +6,14 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
-engine_kwargs = {"future": True, "echo": False}
+engine_kwargs = {
+    "future": True,
+    "echo": False,
+    # Enable pre-ping so dropped connections are recycled automatically.
+    "pool_pre_ping": True,
+    # Recycle connections periodically to avoid stale connections on managed DBs.
+    "pool_recycle": 1800,
+}
 
 database_url = settings.DATABASE_URL
 

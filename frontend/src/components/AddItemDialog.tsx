@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Link2, Image as ImageIcon, Video, Loader2, Check, UploadCloud } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddItemDialogProps {
@@ -165,7 +166,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
         }
 
         const token = localStorage.getItem("access_token");
-        const uploadResponse = await fetch("http://localhost:8000/api/v1/items/upload", {
+  const uploadResponse = await fetch(`${API_BASE_URL}/api/v1/items/upload`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

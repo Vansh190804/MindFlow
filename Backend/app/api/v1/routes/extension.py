@@ -21,21 +21,27 @@ from app.core.security import create_jwt, decode_jwt
 from app.db.sessions import AsyncSessionLocal
 from sqlalchemy.future import select
 from app.modals.user import User
-from app.core.gemini_client import generate_tags  # Assume this is a utility for NLP-based tag generation
+from app.core.gemini_client import generate_tags  
 
 router = APIRouter()
 
 
 def _find_extension_dir() -> Path:
-    """
-    Walk up from this file's location to find the project root that contains
-    the 'Extension' folder. This avoids hardcoding a fixed number of parents.
+    """Resolve the filesystem location of the extension source.
 
-    Returns:
-        Path: Absolute path to the Extension directory
-    Raises:
-        FileNotFoundError: If the Extension directory cannot be found
+    The backend now ships with ``Backend/Extension`` by default, so we walk up
+    from this file until that directory is found. Deployments may still
+    override the location via the ``EXTENSION_DIR`` environment variable when
+    the extension assets live elsewhere.
     """
+    # Allow the deployment to explicitly provide the path when the Extension folder
+    # is not co-located with the backend source (e.g., Render service with root dir=Backend).
+    override = os.getenv("EXTENSION_DIR")
+    if override:
+        override_path = Path(override).expanduser().resolve()
+        if override_path.exists() and override_path.is_dir():
+            return override_path
+
     start = Path(__file__).resolve()
     for parent in start.parents:
         candidate = parent / "Extension"

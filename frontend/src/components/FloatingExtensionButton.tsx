@@ -106,7 +106,11 @@ const FloatingExtensionButton: React.FC = () => {
         console.warn('Linked download failed or not available, falling back:', err);
         await downloadExtension();
       }
-      toast({ title: 'Extension Downloaded!', duration: 10000 });
+      toast({
+        title: 'Extension Downloaded!',
+        description: 'Extract the ZIP and load it via chrome://extensions/ (pick the mindflow-extension folder, or Backend/Extension when running from source).',
+        duration: 10000,
+      });
     } catch (error: any) {
       toast({
         title: "Download Failed",

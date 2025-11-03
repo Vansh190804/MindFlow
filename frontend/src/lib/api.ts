@@ -1,6 +1,5 @@
 import { authStorage } from "./auth";
-
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+import { API_BASE_URL } from "./config";
 
 export async function apiRequest(
   endpoint: string,

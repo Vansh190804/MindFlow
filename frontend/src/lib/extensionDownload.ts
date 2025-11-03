@@ -4,20 +4,21 @@
  */
 
 import { authStorage } from './auth';
+import { API_BASE_URL } from './config';
 
 /**
  * Generate a device token for the current logged-in user and download an
  * already-linked extension ZIP that embeds that device token so the extension
  * can auto-link on install.
  */
+
 export const downloadLinkedExtension = async () => {
   try {
-    const apiBase = 'http://localhost:8000';
     const token = authStorage.getToken();
     if (!token) throw new Error('User not authenticated');
 
     // Request a device token from backend
-    const genRes = await fetch(`${apiBase}/api/v1/extension/generate-device-token`, {
+  const genRes = await fetch(`${API_BASE_URL}/api/v1/extension/generate-device-token`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -32,7 +33,7 @@ export const downloadLinkedExtension = async () => {
     const { device_token } = await genRes.json();
 
     // Download extension with embedded device token
-    const downloadRes = await fetch(`${apiBase}/api/v1/extension/download?device_token=${encodeURIComponent(device_token)}`);
+  const downloadRes = await fetch(`${API_BASE_URL}/api/v1/extension/download?device_token=${encodeURIComponent(device_token)}`);
     if (!downloadRes.ok) throw new Error('Failed to download linked extension');
 
     const blob = await downloadRes.blob();
@@ -55,7 +56,7 @@ export const downloadLinkedExtension = async () => {
 export const downloadExtension = async () => {
   try {
     // For now, create a link to download from the backend
-    const response = await fetch('http://localhost:8000/api/v1/extension/download', {
+  const response = await fetch(`${API_BASE_URL}/api/v1/extension/download`, {
       method: 'GET',
     });
 
@@ -125,7 +126,7 @@ How to Install:
 2. Open Chrome and go to chrome://extensions/
 3. Enable "Developer mode" (top-right toggle)
 4. Click "Load unpacked"
-5. Select the extracted Extension folder
+5. Select the extracted mindflow-extension folder (or 'Backend/Extension' when running from source)
 6. Click the extension icon and sign in with Google
 
 The extension is now ready to use!`;
