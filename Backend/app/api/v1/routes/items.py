@@ -26,13 +26,30 @@ async def _fetch_page_metadata(url: Optional[str]) -> dict:
     if not _looks_like_url(url):
         return {}
 
+    is_youtube = _is_youtube_url(url)
+
+    headers = {
+        "User-Agent": "MindFlowBot/1.0 (+https://mindflow.ai)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+
     try:
         async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
-            response = await client.get(url, headers={
-                "User-Agent": "MindFlowBot/1.0 (+https://mindflow.ai)",
-            })
+            response = await client.get(url, headers=headers)
             response.raise_for_status()
-    except Exception as exc:
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code in (403, 429) and is_youtube:
+            fallback = await _fetch_youtube_oembed_metadata(url)
+            if fallback:
+                return fallback
+        print(f"Page metadata fetch failed for {url}: {exc}")
+        return {}
+    except httpx.RequestError as exc:
+        if is_youtube:
+            fallback = await _fetch_youtube_oembed_metadata(url)
+            if fallback:
+                return fallback
         print(f"Page metadata fetch failed for {url}: {exc}")
         return {}
 
@@ -108,6 +125,58 @@ def _youtube_embed_url(url: str) -> Optional[str]:
         if video_id:
             return f"https://www.youtube.com/embed/{video_id}"
     return None
+
+
+def _is_youtube_url(url: Optional[str]) -> bool:
+    if not _looks_like_url(url):
+        return False
+    parsed = urlparse(url)
+    host = parsed.netloc.lower()
+    return "youtube.com" in host or "youtu.be" in host
+
+
+async def _fetch_youtube_oembed_metadata(url: str) -> Optional[dict]:
+    oembed_url = "https://www.youtube.com/oembed"
+    params = {"url": url, "format": "json"}
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                oembed_url,
+                params=params,
+                headers={
+                    "User-Agent": "MindFlowBot/1.0 (+https://mindflow.ai)",
+                    "Accept": "application/json",
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+    except Exception as exc:
+        print(f"YouTube oEmbed metadata fetch failed for {url}: {exc}")
+        return None
+
+    embed_url = _youtube_embed_url(url)
+    description_parts: List[str] = []
+    author = data.get("author_name")
+    provider = data.get("provider_name")
+    if author:
+        description_parts.append(f"Creator: {author}")
+    if provider:
+        description_parts.append(f"Platform: {provider}")
+
+    description = " | ".join(description_parts) if description_parts else None
+
+    title = data.get("title")
+
+    return {
+        "title": title,
+        "description": description,
+        "text": title or description or "",
+        "og_image": data.get("thumbnail_url"),
+        "og_video": embed_url,
+        "og_type": data.get("type") or "video",
+        "canonical": url,
+        "content_type": "text/html",
+    }
 
 router = APIRouter()
 security = HTTPBearer()
