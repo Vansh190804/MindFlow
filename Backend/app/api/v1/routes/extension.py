@@ -22,6 +22,7 @@ from app.db.sessions import AsyncSessionLocal
 from sqlalchemy.future import select
 from app.modals.user import User
 from app.core.gemini_client import generate_tags  
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -98,6 +99,18 @@ def create_extension_zip(device_token: str = None) -> str:
                 zipf.write(icon_file, f"mindflow-extension/icons/{icon_file.name}")
             for icon_file in icons_dir.glob("*.png"):
                 zipf.write(icon_file, f"mindflow-extension/icons/{icon_file.name}")
+        # Embed deployment-specific configuration so the background worker knows
+        # which API/Dashboard URLs to target after download. These can be
+        # overridden via env vars when building the backend image.
+        api_base = os.getenv("EXTENSION_API_BASE_URL", settings.BACKEND_PUBLIC_URL).rstrip("/") or "http://localhost:8000"
+        dashboard_base = os.getenv("EXTENSION_DASHBOARD_URL", settings.FRONTEND_URL).rstrip("/") or "http://localhost:8080"
+        zipf.writestr(
+            "mindflow-extension/extension.config.json",
+            json.dumps({
+                "api_base_url": api_base,
+                "dashboard_url": dashboard_base,
+            }, indent=2)
+        )
         # Optionally embed a device token file so the installed extension can auto-link
         # Do this regardless of whether an icons directory exists.
         if device_token:

@@ -6,6 +6,15 @@
 
 MindFlow Extension is a complete browser extension that seamlessly integrates with your MindFlow dashboard. Capture text, links, images, and videos with a simple right-click, powered by AI for automatic tagging and organization.
 
+## ⚙️ Deployment configuration
+
+When you download the extension through the backend (`/api/v1/extension/download`) the ZIP now includes an `extension.config.json` file that tells the background worker which URLs to hit. Configure these env vars on the backend service before packaging:
+
+- `BACKEND_PUBLIC_URL` (or `EXTENSION_API_BASE_URL`) → public API base, e.g. `https://mindflow-backend-qsmf.onrender.com`
+- `FRONTEND_URL` (or `EXTENSION_DASHBOARD_URL`) → dashboard base, e.g. your deployed frontend domain
+
+Local development keeps the defaults (`http://localhost:8000` and `http://localhost:5173`), but production must set the public URLs so saves succeed.
+
 ## 🎯 Complete Feature Set
 
 ### Authentication Flow ✅

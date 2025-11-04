@@ -36,7 +36,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["icons/*.svg", "icons/*.png"],
+      "resources": [
+        "icons/*.svg",
+        "icons/*.png",
+        "extension.config.json",
+        "device_token.json"
+      ],
       "matches": ["<all_urls>"]
     }
   ]

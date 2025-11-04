@@ -76,6 +76,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // ignore
     }
   }
+
+  if (message.type === 'ITEM_SAVE_FAILED') {
+    console.warn('❌ Item save failed on background', message.error);
+    try {
+      const inline = message.inlineToast || {
+        title: 'Save failed',
+        message: `❌ ${message.error || 'Failed to save'}`,
+        ttl: 6000,
+      };
+      inline.loading = false;
+      showInlineToast(inline);
+    } catch (e) {
+      // ignore toast errors
+    }
+  }
   
   sendResponse({ received: true });
   return true;

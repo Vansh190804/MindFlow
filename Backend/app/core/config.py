@@ -15,15 +15,8 @@ class Settings(BaseModel):
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
     JWT_SECRET: str = os.getenv("JWT_SECRET", "")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
-    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
-    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "2525"))
-    SMTP_USER: str = os.getenv("SMTP_USER", "")
-    SMTP_PASS: str = os.getenv("SMTP_PASS", "")
-    SMTP_FROM: str = os.getenv("SMTP_FROM", "no-reply@mindflow.app")
-    # Optional: enable SMTP debug logs and configure envelope sender
-    SMTP_DEBUG: bool = os.getenv("SMTP_DEBUG", "0") in ("1", "true", "True")
-    SMTP_ENVELOPE_FROM: str = os.getenv("SMTP_ENVELOPE_FROM", "")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:8080")
+    BACKEND_PUBLIC_URL: str = os.getenv("BACKEND_PUBLIC_URL", os.getenv("RENDER_EXTERNAL_URL", "http://localhost:8000"))
 
     @model_validator(mode="after")
     def _normalize_database_url(self) -> "Settings":
