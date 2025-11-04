@@ -152,7 +152,7 @@ MindFlow/
 - 🔗 **Links** - Bookmarks with automatic metadata
 - 🖼️ **Images** - Visual content with AI descriptions
 - 🎥 **Videos** - Video links with thumbnails
-- 💬 **Quotes** - Memorable passages
+- 💬 **Article** - documentations in pdf format
 
 ### AI Capabilities
 - Auto-tagging with Gemini AI
