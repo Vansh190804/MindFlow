@@ -1,9 +1,19 @@
+import asyncio
 import json
 import google.generativeai as genai
 from app.core.config import settings
 import httpx
 from PIL import Image
 import io
+from typing import Callable, TypeVar, Any
+
+try:
+    # Available when google-api-core is present (bundled with google-generativeai)
+    from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable, InternalServerError
+except ImportError:  # pragma: no cover - defensive fallback
+    ResourceExhausted = ServiceUnavailable = InternalServerError = Exception  # type: ignore
+
+T = TypeVar("T")
 
 # Configure Gemini
 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -14,10 +24,12 @@ async def create_embedding(text: str):
     Create embeddings using Gemini's text-embedding-004 model
     """
     try:
-        result = genai.embed_content(
-            model="models/text-embedding-004",
-            content=text,
-            task_type="retrieval_document"
+        result = await _call_with_retries(
+            lambda: genai.embed_content(
+                model="models/text-embedding-004",
+                content=text,
+                task_type="retrieval_document"
+            )
         )
         return result['embedding']
     except Exception as e:
@@ -44,7 +56,7 @@ Make tags relevant, concise (1-2 words each), and useful for organizing content.
 Category should be one word like: work, personal, learning, reference, creative, technical, etc.
 Title should be a clear, concise summary (4-8 words) that captures the essence of the content."""
 
-        response = model.generate_content(prompt)
+        response = await _call_with_retries(lambda: model.generate_content(prompt))
         raw = response.text.strip()
         
         # Remove markdown code blocks if present
@@ -84,7 +96,7 @@ async def generate_description(text: str) -> str:
 Content: {text}
 
 Return ONLY the plain description text (no JSON, no markdown).'''
-        response = model.generate_content(prompt)
+        response = await _call_with_retries(lambda: model.generate_content(prompt))
         raw = response.text.strip()
         # Strip code fences if present
         if raw.startswith("```"):
@@ -130,7 +142,7 @@ Category should be one word like: work, personal, learning, reference, creative,
 Title should be a clear, descriptive summary (4-8 words) based on what you SEE in the image.
 Description should be 1-2 sentences describing what's in the image."""
 
-        response = model.generate_content([prompt, image])
+        response = await _call_with_retries(lambda: model.generate_content([prompt, image]))
         raw = response.text.strip()
         
         # Remove markdown code blocks
@@ -176,7 +188,6 @@ async def analyze_video(video_url: str, title: str = ""):
         # Create a temporary file
         import tempfile
         import os
-        import time
         
         # Save to temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_file:
@@ -192,7 +203,7 @@ async def analyze_video(video_url: str, title: str = ""):
             # Wait for the file to be processed
             print(f"⏳ Processing video...")
             while video_file.state.name == "PROCESSING":
-                time.sleep(3)
+                await asyncio.sleep(3)
                 video_file = genai.get_file(video_file.name)
             
             if video_file.state.name == "FAILED":
@@ -220,7 +231,7 @@ Category should be one word like: tutorial, entertainment, educational, work, cr
 Title should be a clear, descriptive summary (4-8 words) based on what you SEE in the video.
 Description should be 1-2 sentences describing what's actually shown in the video."""
 
-            response = model.generate_content([video_file, prompt])
+            response = await _call_with_retries(lambda: model.generate_content([video_file, prompt]))
             raw = response.text.strip()
             
             print(f"🤖 Gemini analysis complete")
@@ -275,8 +286,33 @@ async def generate_content(prompt: str) -> str:
     """
     try:
         model = genai.GenerativeModel('gemini-2.5-flash')
-        response = model.generate_content(prompt)
+        response = await _call_with_retries(lambda: model.generate_content(prompt))
         return response.text
     except Exception as e:
         print(f"❌ Content generation failed: {str(e)}")
         raise Exception(f"Failed to generate content: {str(e)}")
+
+
+async def _call_with_retries(func: Callable[[], T], max_attempts: int = 3, base_delay: float = 1.5) -> T:
+    """Call a synchronous Gemini SDK function with retry/backoff on transient quota errors."""
+    delay = base_delay
+    last_error: Any = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return func()
+        except (ResourceExhausted, ServiceUnavailable, InternalServerError) as exc:
+            last_error = exc
+        except Exception as exc:  # catch other quota style errors via string inspection
+            message = str(exc).lower()
+            if any(token in message for token in ["resource exhausted", "quota", "429"]):
+                last_error = exc
+            else:
+                raise
+
+        if attempt == max_attempts:
+            raise last_error  # type: ignore
+
+        await asyncio.sleep(delay)
+        delay *= 2
+
+    raise last_error  # type: ignore  # pragma: no cover - logically unreachable

@@ -58,6 +58,7 @@ const Spaces = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [spaceToDelete, setSpaceToDelete] = useState<Space | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [newSpace, setNewSpace] = useState({
     name: "",
     description: "",
@@ -119,7 +120,12 @@ const Spaces = () => {
   };
 
   const createSpace = async () => {
+    if (!newSpace.name.trim() || creating) {
+      return;
+    }
+
     try {
+      setCreating(true);
       console.log("Creating space:", newSpace);
       await api.post("/api/v1/spaces/", newSpace);
       toast({
@@ -136,6 +142,8 @@ const Spaces = () => {
         description: error.message || "Failed to create space",
         variant: "destructive",
       });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -308,7 +316,7 @@ const Spaces = () => {
                   </Button>
                   <Button
                     onClick={createSpace}
-                    disabled={!newSpace.name.trim()}
+                    disabled={!newSpace.name.trim() || creating}
                     className="shadow-[0_10px_40px]"
                     style={{
                       background: `linear-gradient(135deg, ${newSpace.color}, ${newSpace.color}AA)`,
@@ -316,7 +324,14 @@ const Spaces = () => {
                       boxShadow: `0 10px 40px ${newSpace.color}55, 0 0 20px ${newSpace.color}44`,
                     }}
                   >
-                    Create Space
+                    {creating ? (
+                      <span className="inline-flex items-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </span>
+                    ) : (
+                      "Create Space"
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
