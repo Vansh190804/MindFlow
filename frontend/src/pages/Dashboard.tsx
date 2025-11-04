@@ -211,9 +211,9 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout onItemAdded={fetchItems}>
-      <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+      <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold sm:text-3xl mb-2">Dashboard</h1>
           <p className="text-muted-foreground">Overview of your latest content</p>
         </div>
 

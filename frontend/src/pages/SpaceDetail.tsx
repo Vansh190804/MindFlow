@@ -282,20 +282,20 @@ const SpaceDetail = () => {
   return (
     <DashboardLayout>
       <div className="min-h-screen" style={{ background: `linear-gradient(to bottom right, ${lightTheme}, transparent)` }}>
-        <div className="p-8">
+        <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {/* Header Section */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <Button
               variant="ghost"
               onClick={() => navigate("/spaces")}
-              className="mb-4 hover:bg-white/50"
+              className="mb-4 hover:bg-white/50 w-full justify-start sm:w-auto"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
               Back to Spaces
             </Button>
 
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div
                   className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
                   style={{ backgroundColor: mediumTheme }}
@@ -304,9 +304,9 @@ const SpaceDetail = () => {
                     {space.icon === "Sparkles" ? "✨" : space.icon === "Lightbulb" ? "💡" : "📁"}
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-4xl font-bold" style={{ color: themeColor }}>
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <h1 className="text-3xl font-bold sm:text-4xl" style={{ color: themeColor }}>
                       {space.name}
                     </h1>
                     {space.is_suggested && (
@@ -338,7 +338,7 @@ const SpaceDetail = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 self-start">
                 <Button
                   variant="outline"
                   size="icon"
@@ -360,7 +360,7 @@ const SpaceDetail = () => {
               color: "white",
             }}
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-2xl font-bold" style={{ color: themeColor }}>
                 Items in this Space
               </h2>
@@ -369,7 +369,7 @@ const SpaceDetail = () => {
                   backgroundColor: themeColor,
                   color: "white",
                 }}
-                className="hover:opacity-90"
+                className="w-full hover:opacity-90 sm:w-auto"
                 onClick={openAddItemsDialog}
               >
                 <Plus className="mr-2 w-4 h-4" />

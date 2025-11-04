@@ -12,10 +12,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)
 
 app.add_middleware(
     CORSMiddleware,
-    # For local development we allow frontend localhost origins and also permit
-    # Chrome extension origins via a regex. Chrome extension origins have the
-    # scheme chrome-extension://<extension-id>, so we allow that pattern here.
-    allow_origins=["http://localhost:8080", "http://localhost:5173", "https://your-vercel-url.vercel.app"],
+    allow_origins=["http://localhost:8080", "http://localhost:5173", "https://mind-flow-steel.vercel.app/"],
     allow_origin_regex=r"^chrome-extension://.*$",
     allow_credentials=True,
     allow_methods=["*"],

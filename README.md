@@ -12,7 +12,7 @@ MindFlow is an intelligent bookmark and note-taking application inspired by MyMi
 - 🔍 **Smart Search** - Find anything with semantic search powered by vector embeddings
 - 🎨 **Beautiful Spaces** - Organize items into themed collections with custom colors
 - 🌐 **Browser Extension** - Capture content from any webpage with a right-click
-- 📱 **Modern UI** - Clean, intuitive interface built with React and Tailwind CSS
+- 📱 **Fully Responsive UI** - Mobile-first dashboard with adaptive layouts and navigation
 - 🔐 **Secure OAuth** - Sign in with Google for seamless authentication
 
 ## 🚀 Quick Start
@@ -140,6 +140,13 @@ MindFlow/
 
 ## 🎯 Features
 
+### Responsive Experience
+
+- Adaptive dashboard shell with a collapsible mobile navigation sheet and persistent desktop sidebar.
+- Responsive grids, cards, and masonry layouts that scale from single-column mobile views to wide-screen dashboards.
+- Space detail hero, action buttons, and tabs that stack gracefully on phones while keeping quick actions within reach.
+- Full-screen search and filter surfaces tuned for touch input with accessible hit areas across breakpoints.
+
 ### Content Types
 - 📝 **Notes** - Text snippets and thoughts
 - 🔗 **Links** - Bookmarks with automatic metadata
@@ -234,41 +241,3 @@ pytest
 - Zip Extension folder
 - Publish to Chrome Web Store (optional)
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🙏 Acknowledgments
-
-- Inspired by [MyMind](https://mymind.com)
-- Built with [Lovable](https://lovable.dev)
-- Powered by Google Gemini AI
-
-## 📞 Support
-
-For issues, questions, or feature requests:
-- Open a GitHub issue
-- Check documentation files
-- Review testing guides
-
----
-
-**Made with ❤️ using Lovable**
-
-## Lovable Project Info
-
-**URL**: https://lovable.dev/projects/3bccfd33-5edc-4fd4-9df5-b7af9d4907e8
-
-### Editing via Lovable
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/3bccfd33-5edc-4fd4-9df5-b7af9d4907e8) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.

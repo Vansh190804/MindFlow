@@ -185,10 +185,10 @@ const Settings = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Manage your profile and authentication</p>
+      <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold sm:text-3xl">Settings</h1>
+          <p className="text-muted-foreground max-w-2xl">Manage your profile, extension, and authentication preferences.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect } from "react";
-import { Brain, LayoutDashboard, Layers, Package, Search, Settings, LogOut, X, Filter, Calendar, FileType, ExternalLink, Copy } from "lucide-react";
+import { Brain, LayoutDashboard, Layers, Package, Search, Settings, LogOut, X, Filter, Calendar, FileType, ExternalLink, Copy, Menu } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -64,6 +65,7 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
   const [profileVersion, setProfileVersion] = useState(0);
   const user = getCurrentUser();
   const { toast } = useToast();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -238,11 +240,43 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 
+  const renderNavigation = (options?: { onNavigate?: () => void; itemClassName?: string; navClassName?: string }) => {
+    const { onNavigate, itemClassName, navClassName } = options || {};
+    return (
+      <nav className={cn("flex-1 space-y-2", navClassName)}>
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate();
+                }
+              }}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all",
+                itemClassName,
+                isActive
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+              )}
+            >
+              <item.icon className="w-5 h-5" />
+              <span>{item.label}</span>
+            </NavLink>
+          );
+        })}
+      </nav>
+    );
+  };
+
   return (
-    <div className="relative min-h-screen overflow-hidden text-foreground bg-gradient-to-b from-[#0a0f1f] via-[#0a0d17] to-[#05070d] flex">
+    <div className="relative min-h-screen overflow-hidden text-foreground bg-gradient-to-b from-[#0a0f1f] via-[#0a0d17] to-[#05070d] flex flex-col lg:flex-row">
       {/* Background animation removed for performance */}
       {/* Sidebar */}
-      <aside className="relative z-10 w-64 border-r border-border/50 flex flex-col p-6">
+      <aside className="relative z-10 hidden w-64 border-r border-border/50 flex-shrink-0 flex-col p-6 lg:flex">
         {/* Logo */}
         <div className="flex items-center gap-2 mb-8 px-4">
           <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -252,186 +286,234 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all",
-                  isActive
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
+        {renderNavigation()}
       </aside>
 
       {/* Main Content */}
-  <div className="relative z-10 flex-1 flex flex-col">
+      <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <header className="h-16 border-b border-border/50 px-8 flex items-center justify-between relative">
-          <div className="flex-1 max-w-xl flex gap-2 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search notes, links, images, videos..."
-                className="bg-secondary/50 border-border/50 rounded-2xl pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchQuery && setSearchActive(true)}
-              />
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={closeSearch}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button className="relative bg-white/3 backdrop-blur-sm hover:bg-white/6 border border-border/20 px-3 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2">
-                  <Filter className="w-4 h-4" />
-                  <span className="font-medium">Filters</span>
-                  {activeFilterCount > 0 && (
-                    <span className="ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs bg-accent/20 text-accent border border-accent/30">{activeFilterCount}</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96 p-0">
-                  <Card className="bg-background/60 backdrop-blur-md rounded-2xl shadow-2xl border border-border/20 overflow-hidden">
-                    <CardContent className="p-4 space-y-4">
+        <header className="relative border-b border-border/50 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-wrap items-center gap-3 sm:flex-nowrap">
+              <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-xl border border-border/40 bg-white/5 hover:bg-white/10 lg:hidden"
+                    aria-label="Open navigation"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-full max-w-xs border-r border-border/40 bg-gradient-to-b from-[#0a0f1f] via-[#0a0d17] to-[#05070d] px-6 py-6">
+                  <SheetHeader className="text-left">
+                    <SheetTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                        <Brain className="h-5 w-5 text-primary" />
+                      </div>
+                      MindFlow
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-6 pr-1">
+                    {renderNavigation({
+                      onNavigate: () => setMobileNavOpen(false),
+                      itemClassName: "text-base",
+                    })}
+                    <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-white/5 p-4">
+                      <Avatar className="h-12 w-12 border border-primary/30">
+                        {user?.avatar && <AvatarImage src={user.avatar} alt={user.name || user.email} />}
+                        <AvatarFallback className="bg-primary/20 text-primary">
+                          {user ? getInitials(user.name, user.email) : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm leading-5">
+                        <p className="font-medium text-foreground">{user?.name || "MindFlow user"}</p>
+                        <p className="max-w-[160px] truncate text-muted-foreground">{user?.email}</p>
+                        <div className="mt-3 flex gap-2">
+                          <SheetClose asChild>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/dashboard/settings")}>Settings</Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600" onClick={handleLogout}>Log out</Button>
+                          </SheetClose>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <div className="relative flex-1 min-w-[220px]">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search notes, links, images, videos..."
+                  className="rounded-2xl border-border/50 bg-secondary/50 pl-10 pr-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery && setSearchActive(true)}
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
+                    onClick={closeSearch}
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button className="relative flex items-center gap-2 whitespace-nowrap rounded-xl border border-border/20 bg-white/5 px-3 py-2 shadow-sm transition-all backdrop-blur-sm hover:bg-white/10">
+                    <Filter className="h-4 w-4" />
+                    <span className="font-medium">Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="ml-2 inline-flex items-center justify-center rounded-full border border-accent/30 bg-accent/20 px-2 py-0.5 text-xs text-accent">{activeFilterCount}</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full max-w-sm p-0">
+                  <Card className="overflow-hidden rounded-2xl border border-border/20 bg-background/60 backdrop-blur-md shadow-2xl">
+                    <CardContent className="space-y-4 p-4">
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-semibold">Filters</h4>
                       </div>
-                    {/* Type Filter */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="flex items-center gap-2">
-                          <FileType className="w-4 h-4" />
-                          Content Type
-                        </Label>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="flex items-center gap-2">
+                            <FileType className="h-4 w-4" />
+                            Content Type
+                          </Label>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {contentTypes.map((type) => (
+                            <button
+                              key={type}
+                              onClick={() => toggleType(type)}
+                              className={`px-3 py-1 rounded-lg text-sm transition transform hover:-translate-y-0.5 focus:scale-95 ${filters.types.includes(type) ? 'bg-gradient-to-r from-primary/70 to-accent/60 text-white shadow-md' : 'bg-white/2 text-muted-foreground border border-border/10'}`}
+                              aria-pressed={filters.types.includes(type)}
+                            >
+                              {type}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {contentTypes.map((type) => (
-                          <button
-                            key={type}
-                            onClick={() => toggleType(type)}
-                            className={`px-3 py-1 rounded-lg text-sm transition transform hover:-translate-y-0.5 focus:scale-95 ${filters.types.includes(type) ? 'bg-gradient-to-r from-primary/70 to-accent/60 text-white shadow-md' : 'bg-white/2 text-muted-foreground border border-border/10'}`}
-                            aria-pressed={filters.types.includes(type)}
-                          >
-                            {type}
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label>Date from</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="justify-start text-left font-normal whitespace-nowrap">
+                                <Calendar className="mr-2 h-4 w-4" />
+                                {filters.dateFrom ? (
+                                  format(filters.dateFrom, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="p-0">
+                              <CalendarComponent
+                                mode="single"
+                                selected={filters.dateFrom}
+                                onSelect={(date) =>
+                                  setFilters((prev) => ({
+                                    ...prev,
+                                    dateFrom: date ?? undefined,
+                                  }))
+                                }
+                                defaultMonth={filters.dateFrom}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Date to</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="justify-start text-left font-normal whitespace-nowrap">
+                                <Calendar className="mr-2 h-4 w-4" />
+                                {filters.dateTo ? (
+                                  format(filters.dateTo, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="p-0">
+                              <CalendarComponent
+                                mode="single"
+                                selected={filters.dateTo}
+                                onSelect={(date) =>
+                                  setFilters((prev) => ({
+                                    ...prev,
+                                    dateTo: date ?? undefined,
+                                  }))
+                                }
+                                defaultMonth={filters.dateTo}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
+                      {activeFilterCount > 0 && (
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full border border-border/10 text-muted-foreground hover:bg-red-50 hover:text-black">
+                            Clear
+                          </Button>
+                          <Button size="sm" onClick={() => setShowFilters(false)} className="w-full bg-gradient-to-r from-primary/70 to-accent/60 text-white">
+                            Apply
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </PopoverContent>
+              </Popover>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="h-10 w-10 cursor-pointer border-2 border-primary/20 transition-colors hover:border-primary/40">
+                    {user?.avatar && <AvatarImage src={user.avatar} alt={user.name || user.email} />}
+                    <AvatarFallback className="bg-gradient-primary text-white">
+                      {user ? getInitials(user.name, user.email) : "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                     </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-                    {/* Date Range Filter */}
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        Date Range
-                      </Label>
-                      <div className="flex gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start text-left font-normal rounded-lg px-3 py-2 border border-border/10 bg-white/3 hover:bg-white/6 transition flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm">{filters.dateFrom ? format(filters.dateFrom, "PPP") : "From date"}</span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <div className="p-2"><CalendarComponent
-                              mode="single"
-                              selected={filters.dateFrom}
-                              onSelect={(date) => setFilters({ ...filters, dateFrom: date })}
-                              initialFocus
-                            /></div>
-                          </PopoverContent>
-                        </Popover>
-
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start text-left font-normal rounded-lg px-3 py-2 border border-border/10 bg-white/3 hover:bg-white/6 transition flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm">{filters.dateTo ? format(filters.dateTo, "PPP") : "To date"}</span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <div className="p-2"><CalendarComponent
-                              mode="single"
-                              selected={filters.dateTo}
-                              onSelect={(date) => setFilters({ ...filters, dateTo: date })}
-                              initialFocus
-                            /></div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-
-                    {/* Clear Filters */}
-                    {activeFilterCount > 0 && (
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full border border-border/10 hover:bg-red-50 hover:text-black text-muted-foreground">
-                          Clear
-                        </Button>
-                        <Button size="sm" onClick={() => { /* apply filters */ setShowFilters(false); }} className="w-full bg-gradient-to-r from-primary/70 to-accent/60 text-white">
-                          Apply
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </PopoverContent>
-            </Popover>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button 
-              className="bg-gradient-primary hover:opacity-90"
-              onClick={() => setAddDialogOpen(true)}
-            >
-              Add
-            </Button>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="w-10 h-10 border-2 border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
-                  {user?.avatar && <AvatarImage src={user.avatar} alt={user.name || user.email} />}
-                  <AvatarFallback className="bg-gradient-primary text-white">
-                    {user ? getInitials(user.name, user.email) : "U"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex w-full justify-end">
+              <Button
+                className="w-full bg-gradient-primary px-5 hover:opacity-90 sm:w-auto"
+                onClick={() => setAddDialogOpen(true)}
+              >
+                Add
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -439,12 +521,12 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
 
         {/* Search Results Overlay */}
         {searchActive && searchQuery && (
-          <div className="absolute top-16 left-64 right-0 bottom-0 z-50 pointer-events-auto">
-            {/* Backdrop to visually separate search overlay */}
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeSearch} />
-            <div className="relative max-w-6xl mx-auto p-6">
-              <div className="bg-background/95 rounded-lg shadow-2xl border border-border/30 overflow-hidden">
-                <div className="p-4">
+          <div className="fixed inset-0 z-50 pointer-events-auto">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeSearch} />
+            <div className="relative h-full w-full overflow-y-auto pt-32 sm:pt-28 lg:pt-24 px-4 sm:px-6">
+              <div className="mx-auto max-w-6xl">
+                <div className="bg-background/95 rounded-lg shadow-2xl border border-border/30 overflow-hidden">
+                  <div className="p-4">
                   {searchLoading ? (
                     <div className="text-center py-8 text-muted-foreground">Searching...</div>
                   ) : searchResults.length > 0 ? (
@@ -549,6 +631,7 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">No results found for "{searchQuery}"</div>
                   )}
+                  </div>
                 </div>
               </div>
             </div>

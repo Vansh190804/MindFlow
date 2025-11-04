@@ -537,7 +537,7 @@ const Items = () => {
     <DashboardLayout onItemAdded={fetchItems}>
       {/* Click-away to exit selection mode */}
       <div
-        className="p-8"
+        className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
         onClick={() => {
           if (selectionMode) {
             setSelectionMode(false);
@@ -545,10 +545,10 @@ const Items = () => {
           }
         }}
       >
-        <div className="mb-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">All Items</h1>
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold sm:text-3xl">All Items</h1>
               <p className="text-muted-foreground">Browse and manage your content by type</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -608,7 +608,8 @@ const Items = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={(value) => setSearchParams({ type: value })}>
-          <TabsList className="mb-6 inline-flex gap-2 bg-secondary/8 p-1 rounded-[12px] shadow-sm">
+          <div className="mb-6 overflow-x-auto">
+            <TabsList className="inline-flex min-w-max gap-2 bg-secondary/8 p-1 rounded-[12px] shadow-sm">
               <TabsTrigger
                 value="note"
                 className="px-3 py-2 rounded-[10px] text-sm flex items-center gap-2 transition-all text-muted-foreground data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/70 data-[state=active]:to-accent/60 data-[state=active]:text-white data-[state=active]:shadow-md"
@@ -650,6 +651,7 @@ const Items = () => {
                 <span className="ml-1 text-xs text-muted-foreground">({groupedItems.article.length})</span>
               </TabsTrigger>
             </TabsList>
+          </div>
 
           <TabsContent value="all">
             {renderMasonryGrid(items)}

@@ -88,7 +88,7 @@ const Landing = () => {
       </div>
       {/* Header */}
   <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-2">
             <Brain className="w-6 h-6 text-primary" />
             <span className="text-xl font-semibold">MindFlow</span>
@@ -96,7 +96,7 @@ const Landing = () => {
           <div className="flex items-center gap-4">
             <Button 
               variant="outline" 
-              className="text-sm border-border/50 hover:border-primary/50"
+              className="text-sm border-border/50 hover:border-primary/50 px-4 py-2 sm:px-5"
               onClick={() => navigate("/auth/login")}
             >
               Log in
@@ -106,10 +106,10 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      <section className="relative px-4 pt-28 pb-20 sm:px-6 lg:pt-32">
         {/* Glass panel behind hero for legibility */}
-        <div className="absolute inset-x-6 top-24 flex justify-center -z-10">
-          <div className="relative w-[min(1100px,92vw)] h-[min(440px,70vh)]">
+        <div className="absolute inset-x-4 top-24 flex justify-center -z-10 sm:inset-x-6">
+          <div className="relative h-[min(420px,70vh)] w-[min(1100px,92vw)] sm:h-[min(440px,70vh)]">
             {/* Distant star-like glow behind the glass */}
             <div
               className="absolute -inset-10 rounded-[36px] blur-3xl opacity-70 animate-starPulse"
@@ -124,7 +124,7 @@ const Landing = () => {
             <div className="absolute inset-0 rounded-[28px] ring-1 ring-white/10" />
           </div>
         </div>
-        <div className="container mx-auto max-w-4xl text-center relative">
+        <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
           {/* Badge */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -141,7 +141,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-6xl font-bold mb-6"
+            className="mb-6 text-4xl font-bold leading-tight sm:text-5xl md:text-6xl"
           >
             Collect. Think. Create.
           </motion.h1>
@@ -151,12 +151,12 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex items-center justify-center gap-3 pb-5 flex-wrap"
+            className="flex flex-wrap items-center justify-center gap-3 pb-5"
           >
             {[
               { icon: FileText, label: "Notes" },
               { icon: Link2, label: "Links" },
-              { icon: FileText, label: "Articles (PDF)" },
+              { icon: FileText, label: "Articles" },
               { icon: ImageIcon, label: "Images" },
               { icon: Video, label: "Videos" },
             ].map((type, idx) => (
@@ -178,7 +178,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+            className="mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl"
           >
             MindFlow helps you capture everything, organize it with AI auto-tagging, and surface insights
             instantly with smart search — minimal, fast, and thoughtful.
@@ -189,11 +189,11 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex items-center justify-center gap-4 mb-12"
+            className="mb-12 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4"
           >
             <Button 
               size="lg"
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 hover:shadow-glow transition-all px-8"
+              className="w-full bg-gradient-primary px-8 text-primary-foreground transition-all hover:opacity-90 hover:shadow-glow sm:w-auto"
               onClick={() => navigate("/auth/signin")}
             >
               Get Started
@@ -201,7 +201,7 @@ const Landing = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-border/60 bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all px-8"
+              className="w-full border-border/60 bg-white/5 px-8 transition-all hover:border-primary/50 hover:bg-primary/5 sm:w-auto"
               onClick={() => navigate("/auth/login")}
             >
               Log in
@@ -215,8 +215,8 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto max-w-6xl">
+      <section className="px-4 py-20 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -227,7 +227,7 @@ const Landing = () => {
             What MindFlow Does
           </motion.h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {[
               {
                 icon: Inbox,
@@ -266,8 +266,8 @@ const Landing = () => {
       </section>
 
       {/* What MindFlow Does Section */}
-      <section className="py-20 px-6 bg-card/30">
-        <div className="container mx-auto max-w-6xl">
+      <section className="bg-card/30 px-4 py-20 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -278,7 +278,7 @@ const Landing = () => {
             What Makes MindFlow Different
           </motion.h2>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {[
               {
                 icon: Brain,
@@ -352,8 +352,8 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-  <footer className="py-12 px-6">
-        <div className="container mx-auto max-w-6xl flex items-center justify-between">
+      <footer className="px-4 py-12 sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:items-center sm:text-left">
           <div className="flex items-center gap-2">
             <Brain className="w-5 h-5 text-primary" />
             <span className="font-semibold">MindFlow</span>

@@ -215,19 +215,20 @@ const Spaces = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Spaces</h1>
-            <p className="text-muted-foreground">
+      <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <div className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold sm:text-3xl">Spaces</h1>
+            <p className="text-muted-foreground max-w-2xl">
               AI-powered knowledge organization that learns from your patterns
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button 
-              variant="outline" 
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="outline"
               onClick={loadSuggestions}
               disabled={suggestionsLoading}
+              className="w-full sm:w-auto"
             >
               {suggestionsLoading ? (
                 <Loader2 className="mr-2 w-4 h-4 animate-spin" />
@@ -238,7 +239,7 @@ const Spaces = () => {
             </Button>
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-primary hover:opacity-90">
+                <Button className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto">
                   <Plus className="mr-2 w-4 h-4" />
                   New Space
                 </Button>
