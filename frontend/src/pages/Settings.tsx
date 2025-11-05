@@ -249,39 +249,14 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2">
+                  <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm text-muted-foreground">{joinedText}</p>
-                    <Button onClick={onSave} disabled={saving}>
+                    <Button onClick={onSave} disabled={saving} className="w-full sm:w-auto">
                       <Save className="w-4 h-4 mr-2" />
                       {saving ? "Saving..." : "Save Changes"}
                     </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Authentication */}
-          <Card className="bg-background/60 backdrop-blur-md rounded-2xl shadow-2xl border border-border/20">
-            <CardHeader>
-              <CardTitle>Authentication</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="font-medium">Connected with Google</p>
-                    <p className="text-sm text-muted-foreground">OAuth via Google Account</p>
-                  </div>
-                </div>
-                <Badge variant="secondary">OAuth</Badge>
-              </div>
-              <Separator />
-              <div className="flex justify-end">
-                <Button variant="outline" onClick={onLogout}>
-                  <LogOut className="w-4 h-4 mr-2" /> Logout
-                </Button>
               </div>
             </CardContent>
           </Card>

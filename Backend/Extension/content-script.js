@@ -1,16 +1,8 @@
-// Content script for MindFlow Extension
-// Runs on every page to enable communication with dashboard and detect extension
-
-console.log('🔌 MindFlow Extension: Content script loaded');
-
 // Listen for messages from the web app
 window.addEventListener('message', (event) => {
-  // Only respond to messages from same origin
   if (event.source !== window) return;
   
   if (event.data.type === 'PING_EXTENSION') {
-    console.log('🏓 Received PING, sending EXTENSION_ALIVE');
-    // Respond that extension is alive
     window.postMessage({ 
       type: 'EXTENSION_ALIVE', 
       source: 'mindflow-extension',
@@ -18,14 +10,11 @@ window.addEventListener('message', (event) => {
     }, '*');
   }
   
-  // Auto-sync token from web app
-  // (Legacy token sync removed) The extension now uses an embedded device token
-  // stored in chrome.storage.local. Token sync via postMessage is deprecated.
+  
 });
 
 // On MindFlow dashboard, automatically sync token
 if (window.location.hostname === 'localhost' || window.location.hostname.includes('mindflow')) {
-  console.log('📢 Announcing extension presence to dashboard');
   
   // Announce extension is installed (used by the web app to hide install UI)
   window.postMessage({ 
@@ -46,10 +35,8 @@ if (window.location.hostname === 'localhost' || window.location.hostname.include
 
 // Listen for messages from background script (e.g., item saved)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('📨 Message from background:', message);
   
   if (message.type === 'ITEM_SAVING') {
-    console.log('⏳ Item save started — show loading toast');
     // Show loading state (persistent until replaced)
     try {
       showCaptureAnimation();
@@ -59,7 +46,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'ITEM_SAVED') {
-    console.log('✅ Item saved, notifying dashboard');
     // Forward to dashboard page
     window.postMessage({
       type: 'MINDFLOW_ITEM_SAVED',
@@ -78,7 +64,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'ITEM_SAVE_FAILED') {
-    console.warn('❌ Item save failed on background', message.error);
     try {
       const inline = message.inlineToast || {
         title: 'Save failed',
@@ -140,9 +125,7 @@ function showCaptureAnimation() {
   }
 }
 
-// Small inline toast for quick feedback on the source page.
-// Accepts either a string (simple message) or an object with { title, message, viewUrl, ttl }
-// UX: top-right, larger, faster appear, modern color, longer TTL
+
 function showInlineToast(input) {
   try {
     const id = 'mindflow-inline-toast';
@@ -258,15 +241,4 @@ document.addEventListener('contextmenu', (e) => {
   const isImage = e.target.tagName === 'IMG';
   const isVideo = e.target.tagName === 'VIDEO';
   const isLink = e.target.tagName === 'A' || e.target.closest('a');
-  
-  if (hasSelection || isImage || isVideo || isLink) {
-    console.log('🎯 Content ready for capture:', {
-      hasSelection,
-      isImage,
-      isVideo,
-      isLink
-    });
-  }
 });
-
-console.log('✨ MindFlow Extension: Content script ready');

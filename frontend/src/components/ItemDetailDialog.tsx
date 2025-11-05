@@ -280,45 +280,50 @@ export const ItemDetailDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto sm:w-full">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between pr-8">
-              <span className="capitalize">{currentItem.type}</span>
-              <div className="flex gap-2">
+            <DialogTitle className="flex flex-col gap-3 pr-0 sm:flex-row sm:items-center sm:justify-between sm:pr-8">
+              <span className="capitalize text-lg font-semibold sm:text-xl">{currentItem.type}</span>
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
                 {!isEditing ? (
                   <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleEdit}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
+                    <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        onClick={handleEdit}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full text-destructive hover:text-destructive sm:w-auto"
+                        onClick={() => setDeleteDialogOpen(true)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                     {!isInContextSpace && (
                       <Button
                         size="sm"
                         variant="outline"
+                        className="w-full sm:w-auto"
                         onClick={() => setAddToSpaceOpen(true)}
                       >
                         <FolderPlus className="w-4 h-4 mr-1" />
                         Add to Space
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => setDeleteDialogOpen(true)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
                   </>
                 ) : (
                   <>
                     <Button
                       size="sm"
+                      className="w-full sm:w-auto"
                       onClick={handleSave}
                       disabled={saving}
                     >
@@ -327,6 +332,7 @@ export const ItemDetailDialog = ({
                     <Button
                       size="sm"
                       variant="outline"
+                      className="w-full sm:w-auto"
                       onClick={() => setIsEditing(false)}
                       disabled={saving}
                     >

@@ -249,10 +249,10 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
 
         <div className="relative">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 rounded-xl bg-white/5 backdrop-blur ring-1 ring-white/10 p-1 gap-1">
+            <TabsList className="grid h-auto w-full auto-rows-fr grid-cols-2 gap-2 rounded-xl bg-white/5 backdrop-blur ring-1 ring-white/10 p-1 sm:grid-cols-3 md:grid-cols-5">
               <TabsTrigger
                 value="note"
-                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
+                className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs transition-all duration-300 outline-none sm:px-3 sm:text-sm
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -261,7 +261,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
+                className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs transition-all duration-300 outline-none sm:px-3 sm:text-sm
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -270,7 +270,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="image"
-                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
+                className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs transition-all duration-300 outline-none sm:px-3 sm:text-sm
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -279,7 +279,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="video"
-                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
+                className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs transition-all duration-300 outline-none sm:px-3 sm:text-sm
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -288,7 +288,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="article"
-                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
+                className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs transition-all duration-300 outline-none sm:px-3 sm:text-sm
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -440,7 +440,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
                   <div className="pointer-events-none flex flex-col items-center gap-2">
                     <UploadCloud className="h-9 w-9 text-violet-300 transition group-hover:-translate-y-0.5 group-hover:scale-105" />
                     <span className="text-sm font-medium text-white">Drag & drop or click to choose</span>
-                    <span className="text-xs text-white/60">MP4, MOV, WEBM up to 500MB</span>
+                    <span className="text-xs text-white/60">MP4, MOV, WEBM up to 50MB</span>
                   </div>
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 overflow-hidden rounded-b-2xl bg-white/10">
                     <div
