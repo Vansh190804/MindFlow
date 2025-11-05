@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Edit, Trash2, ExternalLink, Calendar, Tag, Plus, FolderPlus } from "lucide-react";
+import { X, Edit, Trash2, ExternalLink, Calendar, Tag, Plus, FolderPlus, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -73,6 +73,7 @@ export const ItemDetailDialog = ({
   const [creatingSpace, setCreatingSpace] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newSpace, setNewSpace] = useState({ name: "", description: "", color: "#6366f1", icon: "Folder" });
+  const [addToSpaceSubmitting, setAddToSpaceSubmitting] = useState(false);
   const { toast } = useToast();
 
   // Update currentItem when item prop changes
@@ -83,6 +84,31 @@ export const ItemDetailDialog = ({
     }
   }, [item]);
 
+  const assignedSpaceIds = useMemo(() => {
+    const ids = new Set<number>();
+    if (!currentItem) return ids;
+
+    const direct = currentItem.spaceId ?? currentItem.space_id;
+    if (typeof direct === "number") ids.add(direct);
+
+    const maybeArrayIds = (currentItem as any)?.spaceIds ?? (currentItem as any)?.space_ids;
+    if (Array.isArray(maybeArrayIds)) {
+      for (const val of maybeArrayIds) {
+        if (typeof val === "number") ids.add(val);
+      }
+    }
+
+    const maybeSpaces = (currentItem as any)?.spaces;
+    if (Array.isArray(maybeSpaces)) {
+      for (const space of maybeSpaces) {
+        const id = space?.id;
+        if (typeof id === "number") ids.add(id);
+      }
+    }
+
+    return ids;
+  }, [currentItem]);
+
   // Load spaces when Add to Space dialog opens (keep hook before any early return)
   useEffect(() => {
     const loadSpaces = async () => {
@@ -90,10 +116,9 @@ export const ItemDetailDialog = ({
         setSpacesLoading(true);
         const resp = await apiRequest("/api/v1/spaces/", "GET");
         const list = Array.isArray(resp?.spaces) ? resp.spaces : [];
-        const assignedId = item?.spaceId ?? item?.space_id ?? null;
-        const filtered = assignedId ? list.filter((space: any) => space.id !== assignedId) : list;
+        const filtered = list.filter((space: any) => !assignedSpaceIds.has(space.id));
         setSpaces(filtered);
-        setSelectedSpaceId(filtered[0]?.id ?? null);
+        setSelectedSpaceId(filtered.length > 0 ? filtered[0].id : null);
       } catch (e: any) {
         toast({ title: "Error", description: e?.message || "Failed to load spaces", variant: "destructive" });
       } finally {
@@ -101,7 +126,7 @@ export const ItemDetailDialog = ({
       }
     };
     if (addToSpaceOpen) loadSpaces();
-  }, [addToSpaceOpen, item, toast]);
+  }, [addToSpaceOpen, assignedSpaceIds, toast]);
 
   useEffect(() => {
     if (!addToSpaceOpen) {
@@ -124,6 +149,7 @@ export const ItemDetailDialog = ({
   const addItemToSelectedSpace = async () => {
     if (!selectedSpaceId || !currentItem) return;
     try {
+      setAddToSpaceSubmitting(true);
       await apiRequest(`/api/v1/spaces/${selectedSpaceId}/items`, "POST", { item_ids: [currentItem.id] });
       toast({ title: "Added", description: "Item added to space" });
       setAddToSpaceOpen(false);
@@ -131,6 +157,8 @@ export const ItemDetailDialog = ({
       onItemUpdated();
     } catch (e: any) {
       toast({ title: "Error", description: e?.message || "Failed to add to space", variant: "destructive" });
+    } finally {
+      setAddToSpaceSubmitting(false);
     }
   };
 
@@ -571,7 +599,16 @@ export const ItemDetailDialog = ({
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => setAddToSpaceOpen(false)}>Close</Button>
             {spaces.length > 0 ? (
-              <Button onClick={addItemToSelectedSpace} disabled={!selectedSpaceId}>Add</Button>
+              <Button onClick={addItemToSelectedSpace} disabled={!selectedSpaceId || addToSpaceSubmitting}>
+                {addToSpaceSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  "Add"
+                )}
+              </Button>
             ) : showCreateForm ? (
               <Button onClick={createSpaceAndAdd} disabled={!newSpace.name.trim() || creatingSpace}>
                 {creatingSpace ? 'Creating…' : 'Create & Add'}
