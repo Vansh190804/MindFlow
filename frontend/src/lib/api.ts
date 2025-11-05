@@ -66,6 +66,7 @@ export function normalizeItem(item: any) {
   if (!item) return item;
   const preview = item.preview || item.ai_meta?.preview || null;
   const sourceUrl = item.source_url || item.sourceUrl || item.url || item.ai_meta?.source_url || "";
+  const spaceId = item.space_id ?? item.spaceId ?? item.space?.id ?? null;
   return {
     ...item,
     sourceUrl,
@@ -76,6 +77,7 @@ export function normalizeItem(item: any) {
     description: item.description ?? item.ai_meta?.description ?? item.title ?? "",
     // ensure tags exists
     tags: item.tags || [],
+    spaceId,
   };
 }
 

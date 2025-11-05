@@ -36,6 +36,8 @@ interface Item {
   tags: string[];
   folder: string;
   created_at: string;
+  spaceId?: number | null;
+  space_id?: number | null;
 }
 
 interface ItemDetailDialogProps {
@@ -44,6 +46,7 @@ interface ItemDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   onItemUpdated: () => void;
   onItemDeleted: () => void;
+  contextSpaceId?: number | null;
 }
 
 export const ItemDetailDialog = ({
@@ -52,6 +55,7 @@ export const ItemDetailDialog = ({
   onOpenChange,
   onItemUpdated,
   onItemDeleted,
+  contextSpaceId = null,
 }: ItemDetailDialogProps) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -86,8 +90,10 @@ export const ItemDetailDialog = ({
         setSpacesLoading(true);
         const resp = await apiRequest("/api/v1/spaces/", "GET");
         const list = Array.isArray(resp?.spaces) ? resp.spaces : [];
-        setSpaces(list);
-        setSelectedSpaceId(list[0]?.id ?? null);
+        const assignedId = item?.spaceId ?? item?.space_id ?? null;
+        const filtered = assignedId ? list.filter((space: any) => space.id !== assignedId) : list;
+        setSpaces(filtered);
+        setSelectedSpaceId(filtered[0]?.id ?? null);
       } catch (e: any) {
         toast({ title: "Error", description: e?.message || "Failed to load spaces", variant: "destructive" });
       } finally {
@@ -95,9 +101,19 @@ export const ItemDetailDialog = ({
       }
     };
     if (addToSpaceOpen) loadSpaces();
-  }, [addToSpaceOpen, toast]);
+  }, [addToSpaceOpen, item, toast]);
+
+  useEffect(() => {
+    if (!addToSpaceOpen) {
+      setShowCreateForm(false);
+      setSelectedSpaceId(null);
+    }
+  }, [addToSpaceOpen]);
 
   if (!currentItem) return null;
+
+  const assignedSpaceId = currentItem.spaceId ?? currentItem.space_id ?? null;
+  const isInContextSpace = contextSpaceId != null && assignedSpaceId === contextSpaceId;
 
   const handleEdit = () => {
     setEditedDescription(currentItem.description || currentItem.title || "");
@@ -111,6 +127,8 @@ export const ItemDetailDialog = ({
       await apiRequest(`/api/v1/spaces/${selectedSpaceId}/items`, "POST", { item_ids: [currentItem.id] });
       toast({ title: "Added", description: "Item added to space" });
       setAddToSpaceOpen(false);
+  setCurrentItem((prev) => (prev ? { ...prev, spaceId: selectedSpaceId, space_id: selectedSpaceId } : prev));
+      onItemUpdated();
     } catch (e: any) {
       toast({ title: "Error", description: e?.message || "Failed to add to space", variant: "destructive" });
     }
@@ -129,12 +147,15 @@ export const ItemDetailDialog = ({
         const last = list[list.length - 1];
         if (last?.id) {
           await apiRequest(`/api/v1/spaces/${last.id}/items`, "POST", { item_ids: [currentItem.id] });
+          setCurrentItem((prev) => (prev ? { ...prev, spaceId: last.id, space_id: last.id } : prev));
         }
       } else {
         await apiRequest(`/api/v1/spaces/${newId}/items`, "POST", { item_ids: [currentItem.id] });
+  setCurrentItem((prev) => (prev ? { ...prev, spaceId: newId, space_id: newId } : prev));
       }
       toast({ title: "Success", description: "Space created and item added" });
       setAddToSpaceOpen(false);
+      onItemUpdated();
     } catch (e: any) {
       toast({ title: "Error", description: e?.message || "Failed to create space", variant: "destructive" });
     } finally {
@@ -274,14 +295,16 @@ export const ItemDetailDialog = ({
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setAddToSpaceOpen(true)}
-                    >
-                      <FolderPlus className="w-4 h-4 mr-1" />
-                      Add to Space
-                    </Button>
+                    {!isInContextSpace && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setAddToSpaceOpen(true)}
+                      >
+                        <FolderPlus className="w-4 h-4 mr-1" />
+                        Add to Space
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
@@ -506,7 +529,11 @@ export const ItemDetailDialog = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="text-sm text-muted-foreground">You don't have any spaces yet.</div>
+              <div className="text-sm text-muted-foreground">
+                {assignedSpaceId
+                  ? "This item is already assigned to its only available space. Create a new space to move it."
+                  : "You don't have any spaces yet."}
+              </div>
               {!showCreateForm ? (
                 <div className="flex flex-wrap gap-2">
                   <Button onClick={() => setShowCreateForm(true)}>

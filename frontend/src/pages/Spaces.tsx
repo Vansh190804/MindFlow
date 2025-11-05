@@ -59,6 +59,7 @@ const Spaces = () => {
   const [spaceToDelete, setSpaceToDelete] = useState<Space | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [processingSuggestion, setProcessingSuggestion] = useState<{ name: string; action: "accept" | "reject" } | null>(null);
   const [newSpace, setNewSpace] = useState({
     name: "",
     description: "",
@@ -149,6 +150,7 @@ const Spaces = () => {
 
   const acceptSuggestion = async (suggestion: SpaceSuggestion) => {
     try {
+      setProcessingSuggestion({ name: suggestion.name, action: "accept" });
       console.log("Accepting suggestion:", suggestion);
       await api.post("/api/v1/spaces/suggestions/accept", {
         suggestion,
@@ -167,11 +169,14 @@ const Spaces = () => {
         description: error.message || "Failed to accept suggestion",
         variant: "destructive",
       });
+    } finally {
+      setProcessingSuggestion(null);
     }
   };
 
   const rejectSuggestion = async (suggestion: SpaceSuggestion) => {
     try {
+      setProcessingSuggestion({ name: suggestion.name, action: "reject" });
       console.log("Rejecting suggestion:", suggestion);
       await api.post("/api/v1/spaces/suggestions/reject", {
         suggestion,
@@ -189,6 +194,8 @@ const Spaces = () => {
         description: error.message || "Failed to reject suggestion",
         variant: "destructive",
       });
+    } finally {
+      setProcessingSuggestion(null);
     }
   };
 
@@ -253,7 +260,7 @@ const Spaces = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent
-                className="border border-white/10 bg-gray-900/60 text-white backdrop-blur-xl shadow-2xl"
+                className="w-[95vw] sm:max-w-lg border border-white/10 bg-gray-900/60 text-white backdrop-blur-xl shadow-2xl rounded-2xl px-4 py-5 sm:px-6 sm:py-6"
                 style={{
                   boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px ${newSpace.color}33, inset 0 1px 0 rgba(255,255,255,0.06)`,
                 }}
@@ -349,6 +356,11 @@ const Spaces = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {suggestions.map((suggestion, index) => {
                 const Icon = iconMap[suggestion.icon] || Folder;
+                const isAccepting =
+                  processingSuggestion?.name === suggestion.name && processingSuggestion?.action === "accept";
+                const isRejecting =
+                  processingSuggestion?.name === suggestion.name && processingSuggestion?.action === "reject";
+                const anyProcessing = Boolean(processingSuggestion);
                 return (
                   <Card key={index} className="border-2 border-primary/20">
                     <CardHeader>
@@ -378,18 +390,28 @@ const Spaces = () => {
                           size="sm"
                           className="flex-1"
                           onClick={() => acceptSuggestion(suggestion)}
+                          disabled={anyProcessing}
                         >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Accept
+                          {isAccepting ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                          )}
+                          {isAccepting ? "Processing" : "Accept"}
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           className="flex-1"
                           onClick={() => rejectSuggestion(suggestion)}
+                          disabled={anyProcessing}
                         >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reject
+                          {isRejecting ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <XCircle className="w-4 h-4 mr-1" />
+                          )}
+                          {isRejecting ? "Processing" : "Reject"}
                         </Button>
                       </div>
                     </CardContent>

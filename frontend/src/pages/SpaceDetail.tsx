@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect } from "react";
-import { Trash2, Loader2, Plus, ArrowLeft, Sparkles, Check, Search, ExternalLink, Copy, FileText, Link2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Trash2, Loader2, Plus, ArrowLeft, Sparkles, Search, ExternalLink, Copy, Link2, CheckSquare } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { ItemDetailDialog } from "@/components/ItemDetailDialog";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { api, normalizeItems } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -49,11 +50,19 @@ interface Item {
   folder: string;
   created_at: string;
   sourceUrl?: string;
+  url?: string;
+  mimeType?: string;
+  storagePath?: string;
+  publicUrl?: string;
+  aiMeta?: any;
+  pageContentType?: string;
   preview?: {
     type?: string;
     value?: string;
   } | null;
   thumbnail?: string | null;
+  spaceId?: number | null;
+  space_id?: number | null;
 }
 
 const normalizeSpaceItem = (input: any): Item => ({
@@ -65,16 +74,95 @@ const normalizeSpaceItem = (input: any): Item => ({
   tags: Array.isArray(input.tags) ? input.tags : [],
   folder: input.folder || input.ai_meta?.category || "general",
   created_at: input.created_at || new Date().toISOString(),
-  sourceUrl: input.sourceUrl,
+  sourceUrl: input.sourceUrl || input.source_url || (typeof input.url === "string" ? input.url : undefined),
+  url: typeof input.url === "string" ? input.url : undefined,
+  mimeType: input.mime_type || input.mimeType || input.ai_meta?.mime_type,
+  storagePath: typeof input.storage_path === "string" ? input.storage_path : undefined,
+  publicUrl: typeof input.public_url === "string" ? input.public_url : undefined,
+  aiMeta: input.ai_meta || input.aiMeta || null,
+  pageContentType:
+    input.ai_meta?.page?.content_type ||
+    input.ai_meta?.page?.contentType ||
+    (typeof input.ai_meta?.page?.headers?.get === "function"
+      ? input.ai_meta.page.headers.get("content-type")
+      : input.ai_meta?.page?.headers?.["content-type"]),
   preview: input.preview || input.ai_meta?.preview || null,
   thumbnail: input.thumbnail || input.ai_meta?.thumbnail || null,
+  spaceId: input.space_id ?? input.spaceId ?? null,
+  space_id: input.space_id ?? input.spaceId ?? null,
 });
+
+const resolveMediaUrl = (input?: string | null) => {
+  if (!input) {
+    return undefined;
+  }
+
+  if (/^(?:https?:)?\/\//i.test(input) || input.startsWith("data:")) {
+    if (input.startsWith("//")) {
+      const protocol = typeof window !== "undefined" ? window.location.protocol : "https:";
+      return `${protocol}${input}`;
+    }
+    return input;
+  }
+
+  if (input.startsWith("/")) {
+    return `${API_BASE_URL}${input}`;
+  }
+
+  return input;
+};
+
+const isPdfUrl = (value?: string) => {
+  if (!value) {
+    return false;
+  }
+  return /\.pdf(?:$|[?#])/i.test(value);
+};
+
+const isPdfMime = (value?: string) => {
+  if (!value) {
+    return false;
+  }
+  return /pdf/i.test(value);
+};
 
 const getPreviewData = (item: Item) => {
   const preview = item.preview;
-  const type = preview?.type || item.type;
-  const value = preview?.value || item.content || "";
-  return { type, value, sourceUrl: item.sourceUrl };
+  const rawType = preview?.type || item.type || "";
+  let type = rawType.toLowerCase();
+
+  const resolvedPreviewValue = resolveMediaUrl(typeof preview?.value === "string" ? preview.value : undefined);
+  const resolvedContentValue = resolveMediaUrl(typeof item.content === "string" ? item.content : undefined);
+  const resolvedSourceUrl = resolveMediaUrl(item.sourceUrl || item.url);
+  const resolvedPublicUrl = resolveMediaUrl(item.publicUrl);
+  const resolvedStorageUrl = resolveMediaUrl(item.storagePath);
+
+  let value: string | undefined =
+    resolvedPreviewValue ||
+    resolvedContentValue ||
+    resolvedSourceUrl ||
+    resolvedPublicUrl ||
+    resolvedStorageUrl;
+
+  const pdfDetected =
+    rawType === "article" ||
+    isPdfUrl(resolvedPreviewValue || resolvedSourceUrl || resolvedContentValue || resolvedPublicUrl || resolvedStorageUrl) ||
+    isPdfMime(item.mimeType) ||
+    (typeof item.pageContentType === "string" && item.pageContentType.toLowerCase().includes("pdf"));
+
+  if (type !== "pdf" && pdfDetected) {
+    type = "pdf";
+  }
+
+  if (!value && type === "pdf") {
+    value = resolvedSourceUrl || resolvedPublicUrl || resolvedStorageUrl || resolvedContentValue;
+  }
+
+  return {
+    type: type || rawType || "",
+    value: value ?? "",
+    sourceUrl: resolvedSourceUrl,
+  };
 };
 
 const SpaceDetail = () => {
@@ -91,14 +179,23 @@ const SpaceDetail = () => {
   // Add Items Dialog
   const [addItemsDialogOpen, setAddItemsDialogOpen] = useState(false);
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
-  const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
+  const [selectedAvailableItemIds, setSelectedAvailableItemIds] = useState<number[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [addingItems, setAddingItems] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedSpaceItemIds, setSelectedSpaceItemIds] = useState<number[]>([]);
+  const [removingItems, setRemovingItems] = useState(false);
   
   // Item Detail Dialog
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [itemDetailOpen, setItemDetailOpen] = useState(false);
+
+  useEffect(() => {
+    if (!selectionMode) {
+      setSelectedSpaceItemIds([]);
+    }
+  }, [selectionMode]);
 
   useEffect(() => {
     if (spaceId) {
@@ -121,9 +218,11 @@ const SpaceDetail = () => {
         is_suggested: response.is_suggested || false,
         created_at: response.created_at,
       });
-      // Map items to include folder field and description
-  const mappedItems = (normalizeItems(response.items || []) as any[]).map(normalizeSpaceItem);
-  setItems(mappedItems);
+    // Map items to include folder field and description
+    const mappedItems = (normalizeItems(response.items || []) as any[]).map(normalizeSpaceItem);
+    setItems(mappedItems);
+    setSelectionMode(false);
+    setSelectedSpaceItemIds([]);
     } catch (error: any) {
       console.error("Error loading space details:", error);
       toast({
@@ -164,13 +263,13 @@ const SpaceDetail = () => {
 
   const openAddItemsDialog = () => {
     setAddItemsDialogOpen(true);
-    setSelectedItemIds([]);
+  setSelectedAvailableItemIds([]);
     setSearchQuery(""); // Reset search
     loadAvailableItems();
   };
 
   const addItemsToSpace = async () => {
-    if (selectedItemIds.length === 0) {
+  if (selectedAvailableItemIds.length === 0) {
       toast({
         title: "No items selected",
         description: "Please select at least one item to add",
@@ -182,16 +281,16 @@ const SpaceDetail = () => {
     try {
       setAddingItems(true);
       await api.post(`/api/v1/spaces/${spaceId}/items`, {
-        item_ids: selectedItemIds,
+        item_ids: selectedAvailableItemIds,
       });
       
       toast({
         title: "Success",
-        description: `Added ${selectedItemIds.length} item(s) to space`,
+  description: `Added ${selectedAvailableItemIds.length} item(s) to space`,
       });
       
-      setAddItemsDialogOpen(false);
-      setSelectedItemIds([]);
+  setAddItemsDialogOpen(false);
+  setSelectedAvailableItemIds([]);
       loadSpaceDetails(); // Reload to show new items
     } catch (error: any) {
       console.error("Error adding items:", error);
@@ -205,12 +304,58 @@ const SpaceDetail = () => {
     }
   };
 
-  const toggleItemSelection = (itemId: number) => {
-    setSelectedItemIds(prev =>
+  const toggleAvailableItemSelection = (itemId: number) => {
+    setSelectedAvailableItemIds(prev =>
       prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
+  };
+
+  const toggleSpaceItemSelection = (itemId: number) => {
+    setSelectedSpaceItemIds(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleSpaceItemClick = (item: Item) => {
+    if (selectionMode) {
+      toggleSpaceItemSelection(item.id);
+      return;
+    }
+    openItemDetail(item);
+  };
+
+  // Bulk detach items from the current space via the new removal endpoint.
+  const removeSelectedItems = async () => {
+    if (!spaceId || selectedSpaceItemIds.length === 0) {
+      return;
+    }
+
+    try {
+      setRemovingItems(true);
+      await api.post(`/api/v1/spaces/${spaceId}/items/remove`, {
+        item_ids: selectedSpaceItemIds,
+      });
+      toast({
+        title: "Items removed",
+        description: `Removed ${selectedSpaceItemIds.length} item(s) from this space`,
+      });
+      setSelectedSpaceItemIds([]);
+      setSelectionMode(false);
+      await loadSpaceDetails();
+    } catch (error: any) {
+      console.error("Error removing items:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove items",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingItems(false);
+    }
   };
 
   // Filter items based on search query
@@ -353,68 +498,138 @@ const SpaceDetail = () => {
 
           {/* Items Section */}
           <div
-            className="rounded-2xl p-6 shadow-lg backdrop-blur-xl"
+            className="rounded-2xl p-6 shadow-lg backdrop-blur-xl flex flex-col gap-4 min-h-[420px]"
             style={{
               background: `linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35))`,
               border: `1px solid ${mediumTheme}`,
               color: "white",
             }}
           >
-            <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-2xl font-bold" style={{ color: themeColor }}>
-                Items in this Space
-              </h2>
-              <Button
-                style={{
-                  backgroundColor: themeColor,
-                  color: "white",
-                }}
-                className="w-full hover:opacity-90 sm:w-auto"
-                onClick={openAddItemsDialog}
-              >
-                <Plus className="mr-2 w-4 h-4" />
-                Add Items
-              </Button>
-            </div>
-
-            {items.length === 0 ? (
-              <div className="text-center py-16">
-                <div
-                  className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: lightTheme }}
-                >
-                  <div className="text-4xl" style={{ color: themeColor }}>📦</div>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">No items yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start adding items to organize your knowledge in this space
-                </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-bold" style={{ color: themeColor }}>
+                  Items in this Space
+                </h2>
+                {selectionMode && (
+                  <p className="mt-1 text-sm text-white/70">
+                    {selectedSpaceItemIds.length} selected
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 w-full sm:w-auto">
+                {selectionMode ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        setSelectionMode(false);
+                        setSelectedSpaceItemIds([]);
+                      }}
+                      disabled={removingItems}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="w-full sm:w-auto"
+                      onClick={removeSelectedItems}
+                      disabled={removingItems || selectedSpaceItemIds.length === 0}
+                    >
+                      {removingItems ? (
+                        <>
+                          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                          Removing...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="mr-2 w-4 h-4" />
+                          Remove{selectedSpaceItemIds.length ? ` (${selectedSpaceItemIds.length})` : ""}
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => setSelectionMode(true)}
+                  >
+                    <CheckSquare className="mr-2 w-4 h-4" />
+                    Select Items
+                  </Button>
+                )}
                 <Button
-                  variant="outline"
-                  style={{ borderColor: themeColor, color: themeColor }}
+                  style={{
+                    backgroundColor: themeColor,
+                    color: "white",
+                  }}
+                  className="w-full hover:opacity-90 sm:w-auto"
                   onClick={openAddItemsDialog}
+                  disabled={selectionMode}
                 >
                   <Plus className="mr-2 w-4 h-4" />
-                  Add Your First Item
+                  Add Items
                 </Button>
               </div>
-            ) : (
-              <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 8px" }}>
-                <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5" style={{ columnGap: "12px" }}>
-                  {items.map((item, idx) => {
-                    const { type: previewType, value: previewValue, sourceUrl } = getPreviewData(item);
-                    const destination = sourceUrl || (typeof previewValue === "string" ? previewValue : "");
+            </div>
 
-                    return (
+            <div className="flex-1 min-h-[300px] overflow-y-auto overflow-x-hidden pr-1">
+              {items.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center py-12 text-center">
+                  <div
+                    className="w-20 h-20 rounded-full mb-4 flex items-center justify-center"
+                    style={{ backgroundColor: lightTheme }}
+                  >
+                    <div className="text-4xl" style={{ color: themeColor }}>📦</div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">No items yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Start adding items to organize your knowledge in this space
+                  </p>
+                  <Button
+                    variant="outline"
+                    style={{ borderColor: themeColor, color: themeColor }}
+                    onClick={openAddItemsDialog}
+                  >
+                    <Plus className="mr-2 w-4 h-4" />
+                    Add Your First Item
+                  </Button>
+                </div>
+              ) : (
+                <div className="mx-auto w-full max-w-[1200px] px-2 sm:px-3 2xl:w-full">
+                  <div className="lg:w-[60vw] columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5" style={{ columnGap: "12px" }}>
+                    {items.map((item, idx) => {
+                      const { type: previewType, value: previewValue, sourceUrl } = getPreviewData(item);
+                      const destination = sourceUrl || (typeof previewValue === "string" ? previewValue : "");
+
+                      return (
                       <div
                         key={item.id}
-                        className="inline-block w-full mb-3 break-inside-avoid cursor-pointer"
+                        className="relative inline-block w-full mb-3 break-inside-avoid cursor-pointer"
                         style={{ breakInside: "avoid" }}
-                        onClick={() => openItemDetail(item)}
+                        onClick={() => handleSpaceItemClick(item)}
                       >
+                        {selectionMode && (
+                          <div
+                            className="absolute top-3 left-3 z-10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Checkbox
+                              checked={selectedSpaceItemIds.includes(item.id)}
+                              onCheckedChange={() => toggleSpaceItemSelection(item.id)}
+                              style={{ borderColor: themeColor }}
+                            />
+                          </div>
+                        )}
                         <div
-                          className="rounded-[12px] p-3 mb-0 text-white"
-                          style={{ backgroundColor: `hsl(${(idx * 12) % 360} 18% 14%)` }}
+                          className={`rounded-[12px] p-3 mb-0 text-white border transition-colors ${selectionMode ? "pt-10 pl-8" : ""}`}
+                          style={{
+                            backgroundColor: `hsl(${(idx * 12) % 360} 18% 14%)`,
+                            borderColor: selectedSpaceItemIds.includes(item.id) ? themeColor : "rgba(255,255,255,0.08)",
+                          }}
                         >
                           {previewType === "image" && typeof previewValue === "string" && previewValue.startsWith("http") && (
                             <img src={previewValue} alt={item.title || ""} className="w-full max-h-48 object-contain rounded-[8px]" />
@@ -434,7 +649,7 @@ const SpaceDetail = () => {
                             )
                           )}
 
-                          {previewType === "pdf" && typeof previewValue === "string" && (
+                          {previewType === "pdf" && typeof previewValue === "string" && previewValue && (
                             <iframe
                               src={previewValue}
                               title={item.title || "PDF preview"}
@@ -443,6 +658,13 @@ const SpaceDetail = () => {
                           )}
 
                           {previewType === "link" && destination && (
+                            isPdfUrl(destination) ? (
+                              <iframe
+                                src={destination}
+                                title={item.title || "PDF preview"}
+                                className="w-full h-48 rounded-[8px] bg-white"
+                              />
+                            ) : (
                             <div className="flex items-center justify-between gap-2">
                               <a
                                 href={destination}
@@ -479,6 +701,7 @@ const SpaceDetail = () => {
                                 </a>
                               </div>
                             </div>
+                            )
                           )}
 
                           {previewType !== "image" &&
@@ -508,18 +731,22 @@ const SpaceDetail = () => {
                           )}
                         </div>
                       </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Add Items Dialog */}
       <Dialog open={addItemsDialogOpen} onOpenChange={setAddItemsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent
+          className="w-[95vw] sm:w-[92vw] md:w-[88vw] lg:w-[70vw] max-w-3xl max-h-[82vh]
+                     overflow-hidden flex flex-col rounded-2xl px-4 py-5 sm:px-6 sm:py-6"
+        >
           <DialogHeader>
             <DialogTitle style={{ color: themeColor }}>Add Items to {space.name}</DialogTitle>
             <DialogDescription>
@@ -562,14 +789,14 @@ const SpaceDetail = () => {
                   <div
                     key={item.id}
                     className="inline-block w-full mb-2 break-inside-avoid relative"
-                    onClick={() => toggleItemSelection(item.id)}
+                    onClick={() => toggleAvailableItemSelection(item.id)}
                     style={{ breakInside: 'avoid' as any }}
                   >
                     {/* Checkbox overlay */}
                     <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
-                        checked={selectedItemIds.includes(item.id)}
-                        onCheckedChange={() => toggleItemSelection(item.id)}
+                        checked={selectedAvailableItemIds.includes(item.id)}
+                        onCheckedChange={() => toggleAvailableItemSelection(item.id)}
                         style={{ borderColor: themeColor }}
                       />
                     </div>
@@ -577,7 +804,7 @@ const SpaceDetail = () => {
                       className="rounded-[12px] p-3 pt-10 pl-8 mb-0 text-white cursor-pointer border"
                       style={{
                         backgroundColor: `hsl(${(idx * 12) % 360} 18% 14%)`,
-                        borderColor: selectedItemIds.includes(item.id) ? themeColor : `${themeColor}30`,
+                        borderColor: selectedAvailableItemIds.includes(item.id) ? themeColor : `${themeColor}30`,
                       }}
                     >
                       {previewType === "image" && typeof previewValue === "string" && previewValue.startsWith("http") && (
@@ -607,6 +834,13 @@ const SpaceDetail = () => {
                       )}
 
                       {previewType === "link" && destination && (
+                        isPdfUrl(destination) ? (
+                          <iframe
+                            src={destination}
+                            title={item.title || "PDF preview"}
+                            className="w-full h-48 rounded-[8px] bg-white"
+                          />
+                        ) : (
                         <div className="flex items-center justify-between gap-2">
                           <a
                             href={destination}
@@ -643,6 +877,7 @@ const SpaceDetail = () => {
                             </a>
                           </div>
                         </div>
+                        )
                       )}
 
                       {previewType !== "image" &&
@@ -680,7 +915,7 @@ const SpaceDetail = () => {
 
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-muted-foreground">
-              {selectedItemIds.length} item(s) selected
+              {selectedAvailableItemIds.length} item(s) selected
             </p>
             <div className="flex gap-2">
               <Button
@@ -697,7 +932,7 @@ const SpaceDetail = () => {
                 }}
                 className="hover:opacity-90"
                 onClick={addItemsToSpace}
-                disabled={addingItems || selectedItemIds.length === 0}
+                disabled={addingItems || selectedAvailableItemIds.length === 0}
               >
                 {addingItems ? (
                   <>
@@ -705,7 +940,7 @@ const SpaceDetail = () => {
                     Adding...
                   </>
                 ) : (
-                  `Add ${selectedItemIds.length} Item(s)`
+                  `Add ${selectedAvailableItemIds.length} Item(s)`
                 )}
               </Button>
             </div>
@@ -749,6 +984,7 @@ const SpaceDetail = () => {
         onOpenChange={setItemDetailOpen}
         onItemUpdated={loadSpaceDetails}
         onItemDeleted={loadSpaceDetails}
+        contextSpaceId={space.id}
       />
     </DashboardLayout>
   );

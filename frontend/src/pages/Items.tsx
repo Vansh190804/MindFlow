@@ -37,6 +37,8 @@ interface Item {
     value: string;
   } | null;
   thumbnail?: string | null;
+  spaceId?: number | null;
+  space_id?: number | null;
 }
 
 const Items = () => {

@@ -255,7 +255,8 @@ async def get_items(
             "folder": ai_meta.get("category", "general"),
             "preview": ai_meta.get("preview"),
             "thumbnail": ai_meta.get("thumbnail"),
-            "created_at": item.created_at
+                "created_at": item.created_at,
+                "space_id": item.space_id
         }
         items_list.append(item_dict)
     
@@ -396,7 +397,8 @@ async def upload_item(
             "tags": new_item.tags,
             "folder": f"AI/{category}" if category else "General",
             "created_at": new_item.created_at,
-            "preview": preview_payload
+            "preview": preview_payload,
+            "space_id": new_item.space_id
         }
     except Exception as e:
         await db.rollback()
@@ -620,7 +622,8 @@ async def create_item(
             "source_url": new_item.url,
             "preview": preview_payload,
             "folder": f"AI/{category}" if category else "General",
-            "created_at": new_item.created_at
+            "created_at": new_item.created_at,
+            "space_id": new_item.space_id
         }
     except Exception as e:
         await db.rollback()
@@ -661,6 +664,7 @@ async def get_item(
         "title": item.title,
         "preview": item.ai_meta.get("preview") if item.ai_meta else None,
         "thumbnail": item.ai_meta.get("thumbnail") if item.ai_meta else None,
+            "space_id": item.space_id,
     }
 
     return item_dict
@@ -759,7 +763,8 @@ async def update_item(
             "tags": item.tags or [],
             "folder": category,
             "created_at": item.created_at,
-            "title": item.title
+            "title": item.title,
+            "space_id": item.space_id
         }
     except Exception as e:
         await db.rollback()

@@ -221,9 +221,10 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-[640px] w-[92vw] max-h-[85vh] overflow-y-auto 
+        className="w-[95vw] max-w-[680px] sm:w-auto max-h-[85vh] overflow-y-auto
                    fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
                    overflow-hidden backdrop-blur-xl border border-white/15 bg-white/10 text-white font-sans leading-relaxed
+                   px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-7 rounded-2xl
                    data-[state=open]:opacity-100 data-[state=open]:scale-100 opacity-0 scale-95 transition-all duration-300
                    before:absolute before:inset-0 before:pointer-events-none before:rounded-2xl 
                    before:bg-[radial-gradient(60%_60%_at_0%_0%,rgba(139,92,246,0.25),transparent_60%),radial-gradient(50%_60%_at_100%_100%,rgba(79,70,229,0.25),transparent_60%)]"
@@ -248,10 +249,10 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
 
         <div className="relative">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 rounded-xl bg-white/5 backdrop-blur ring-1 ring-white/10 p-1">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 rounded-xl bg-white/5 backdrop-blur ring-1 ring-white/10 p-1 gap-1">
               <TabsTrigger
                 value="note"
-                className="rounded-lg px-3 py-2 transition-all duration-300 outline-none
+                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -260,7 +261,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                className="rounded-lg px-3 py-2 transition-all duration-300 outline-none
+                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -269,7 +270,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="image"
-                className="rounded-lg px-3 py-2 transition-all duration-300 outline-none
+                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -278,7 +279,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="video"
-                className="rounded-lg px-3 py-2 transition-all duration-300 outline-none
+                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -287,7 +288,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
               </TabsTrigger>
               <TabsTrigger
                 value="article"
-                className="rounded-lg px-3 py-2 transition-all duration-300 outline-none
+                className="rounded-lg px-3 py-2 text-sm transition-all duration-300 outline-none
                          hover:shadow-[0_0_14px_rgba(139,92,246,0.45)] hover:ring-1 hover:ring-violet-400/40
                          data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500/60 data-[state=active]:to-indigo-500/60 data-[state=active]:text-white data-[state=active]:ring-1 data-[state=active]:ring-violet-400/60"
               >
@@ -363,7 +364,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
                     htmlFor="image-file"
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={(event) => handleFileDrop(event, "image")}
-                    className={`group relative flex h-44 flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "image" ? "border-violet-400/60 bg-white/10" : ""}`}
+                    className={`group relative flex h-40 sm:h-44 flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-5 sm:p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "image" ? "border-violet-400/60 bg-white/10" : ""}`}
                   >
                     <Input
                       id="image-file"
@@ -424,7 +425,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
                   htmlFor="video-file"
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => handleFileDrop(event, "video")}
-                  className={`group relative flex h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "video" ? "border-violet-400/60 bg-white/10" : ""}`}
+                  className={`group relative flex h-40 sm:h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-5 sm:p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "video" ? "border-violet-400/60 bg-white/10" : ""}`}
                 >
                   <Input
                     id="video-file"
@@ -484,7 +485,7 @@ export const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialog
                   htmlFor="article-file"
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => handleFileDrop(event, "article")}
-                  className={`group relative flex h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "article" ? "border-violet-400/60 bg-white/10" : ""}`}
+                  className={`group relative flex h-40 sm:h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 p-5 sm:p-6 text-center transition hover:border-violet-400/60 hover:bg-white/10 ${file && fileType === "article" ? "border-violet-400/60 bg-white/10" : ""}`}
                 >
                   <Input
                     id="article-file"

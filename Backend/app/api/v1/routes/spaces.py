@@ -229,7 +229,8 @@ async def get_space(
             "content": item.content,
             "url": item.url,
             "tags": item.tags or [],
-            "created_at": item.created_at.isoformat()
+            "created_at": item.created_at.isoformat(),
+            "space_id": item.space_id
         }
         items_list.append(item_dict)
     
@@ -288,6 +289,10 @@ class AddItemsRequest(BaseModel):
     item_ids: List[int]
 
 
+class RemoveItemsRequest(BaseModel):
+    item_ids: List[int]
+
+
 @router.post("/{space_id}/items")
 async def add_items_to_space(
     space_id: int,
@@ -341,6 +346,64 @@ async def add_items_to_space(
     
     return {
         "message": f"Added {added_count} item(s) to space",
+        "space_id": space_id,
+        "item_count": space.item_count
+    }
+
+
+@router.post("/{space_id}/items/remove")
+async def remove_items_from_space(
+    space_id: int,
+    request: RemoveItemsRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Detach items from a space without deleting them."""
+    result = await db.execute(
+        select(Space).where(
+            and_(
+                Space.id == space_id,
+                Space.user_id == current_user.id
+            )
+        )
+    )
+    space = result.scalar_one_or_none()
+
+    if not space:
+        raise HTTPException(status_code=404, detail="Space not found")
+
+    if not request.item_ids:
+        return {"message": "No items selected", "removed": 0, "item_count": space.item_count}
+
+    items_result = await db.execute(
+        select(Item).where(
+            and_(
+                Item.id.in_(request.item_ids),
+                Item.user_id == current_user.id,
+                Item.space_id == space_id
+            )
+        )
+    )
+    items = items_result.scalars().all()
+
+    removed_count = 0
+    for item in items:
+        item.space_id = None
+        removed_count += 1
+
+    if removed_count == 0:
+        return {"message": "No matching items found in this space", "removed": 0, "item_count": space.item_count}
+
+    await db.commit()
+
+    space.item_count = await db.scalar(
+        select(func.count(Item.id)).where(Item.space_id == space_id)
+    )
+    await db.commit()
+
+    return {
+        "message": f"Removed {removed_count} item(s) from space",
+        "removed": removed_count,
         "space_id": space_id,
         "item_count": space.item_count
     }
