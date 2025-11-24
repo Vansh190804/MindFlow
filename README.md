@@ -1,94 +1,20 @@
 # MindFlow - AI-Powered Knowledge Management
 
-> Save, organize, and discover your digital content with the power of AI
+Save, organize, and discover your digital content with the power of AI
 
-## 🌟 Overview
+## Overview
 
 MindFlow is an intelligent bookmark and note-taking application inspired by MyMind. It helps you capture content from anywhere, automatically organizes it using AI, and makes everything searchable and discoverable.
 
 ### Key Features
 
-- 🤖 **AI-Powered Organization** - Gemini AI automatically tags and categorizes your content
-- 🔍 **Smart Search** - Find anything with semantic search powered by vector embeddings
-- 🎨 **Beautiful Spaces** - Organize items into themed collections with custom colors
-- 🌐 **Browser Extension** - Capture content from any webpage with a right-click
-- 📱 **Fully Responsive UI** - Mobile-first dashboard with adaptive layouts and navigation
-- 🔐 **Secure OAuth** - Sign in with Google for seamless authentication
+- **AI-Powered Organization** - Gemini AI automatically tags and categorizes your content
+- **Smart Search** - Find anything with semantic search powered by vector embeddings
+- **Beautiful Spaces** - Organize items into themed collections with custom colors
+- **Browser Extension** - Capture content from any webpage with a right-click
+- **Fully Responsive UI** - Mobile-first dashboard with adaptive layouts and navigation
+- **Secure OAuth** - Sign in with Google for seamless authentication
 
-## 🚀 Quick Start
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-
-### Prerequisites
-
-- Node.js & npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
-- Python 3.8+ (for backend)
-- PostgreSQL database
-- Supabase account (for file storage)
-- Google OAuth credentials
-
-### Frontend Setup
-
-```sh
-# Clone the repository
-git clone <YOUR_GIT_URL>
-cd MindFlow
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Backend Setup
-
-```sh
-# Navigate to backend
-cd Backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your credentials
-
-# Run database migrations
-alembic upgrade head
-
-# Start backend server
-uvicorn app.main:app --reload
-```
 
 ### Browser Extension Setup
 
@@ -100,20 +26,7 @@ uvicorn app.main:app --reload
 # Select the Extension folder
 ```
 
-See [EXTENSION_SETUP.md](EXTENSION_SETUP.md) for detailed instructions.
-
-## 📚 Documentation
-
-- [Extension Setup Guide](EXTENSION_SETUP.md) - Complete browser extension installation
-- [Extension Testing](EXTENSION_TESTING.md) - Comprehensive testing checklist
-- [Authentication Setup](AUTHENTICATION_SETUP.md) - OAuth configuration
-- [Image/Video Upload](IMAGE_VIDEO_UPLOAD_SETUP.md) - Supabase storage setup
-- [Intelligent Spaces](INTELLIGENT_SPACES.md) - AI-powered organization
-- [Supabase DB Setup](Backend/SUPABASE_DB_SETUP.md) - Configure the shared PostgreSQL database
-- [SMTP Setup](Backend/SMTP_SETUP.md) - Configure email delivery providers
-- [Testing Guide](TESTING_GUIDE.md) - Backend testing instructions
-
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 MindFlow/
@@ -138,7 +51,7 @@ MindFlow/
 └── public/               # Static assets
 ```
 
-## 🎯 Features
+##  Features
 
 ### Responsive Experience
 
@@ -148,11 +61,11 @@ MindFlow/
 - Full-screen search and filter surfaces tuned for touch input with accessible hit areas across breakpoints.
 
 ### Content Types
-- 📝 **Notes** - Text snippets and thoughts
-- 🔗 **Links** - Bookmarks with automatic metadata
-- 🖼️ **Images** - Visual content with AI descriptions
-- 🎥 **Videos** - Video links with thumbnails
-- 💬 **Article** - documentations in pdf format
+-  **Notes** - Text snippets and thoughts
+-  **Links** - Bookmarks with automatic metadata
+-  **Images** - Visual content with AI descriptions
+-  **Videos** - Video links with thumbnails
+-  **Article** - documentations in pdf format
 
 ### AI Capabilities
 - Auto-tagging with Gemini AI
@@ -200,7 +113,7 @@ MindFlow/
 - **Service Worker** - Background processing
 - **Chrome APIs** - Context menus, storage, notifications
 
-## 🔐 Security
+##  Security
 
 - OAuth 2.0 authentication
 - JWT token-based API access
@@ -209,7 +122,7 @@ MindFlow/
 - Environment variable configuration
 - Chrome extension isolated storage
 
-## 🧪 Testing
+##  Testing
 
 ```sh
 # Frontend tests
@@ -223,7 +136,7 @@ pytest
 # See EXTENSION_TESTING.md for checklist
 ```
 
-## 📦 Deployment
+##  Deployment
 
 ### Frontend
 - Deploy to Vercel, Netlify, or any static host
