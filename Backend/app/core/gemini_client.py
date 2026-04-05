@@ -21,19 +21,19 @@ genai.configure(api_key=settings.GEMINI_API_KEY)
 
 async def create_embedding(text: str):
     """
-    Create embeddings using Gemini's text-embedding-004 model
+    Create embeddings using Gemini's supported embedding model
     """
     try:
         result = await _call_with_retries(
             lambda: genai.embed_content(
-                model="models/text-embedding-004",
+                model="models/gemini-embedding-001",
                 content=text,
                 task_type="retrieval_document"
             )
         )
         return result['embedding']
     except Exception as e:
-        print(f"❌ Embedding generation failed: {str(e)}")
+        print(f"Embedding generation failed: {str(e)}")
         raise Exception(f"Failed to generate embeddings: {str(e)}")
 
 
@@ -112,17 +112,14 @@ async def analyze_image(image_url: str, title: str = ""):
     Analyze an image using Gemini Vision and generate tags, title, and description
     """
     try:
-        # Download image
         async with httpx.AsyncClient() as client:
             response = await client.get(image_url)
             response.raise_for_status()
             image_data = response.content
         
-        # Open image with PIL
         image = Image.open(io.BytesIO(image_data))
         
-        # Use gemini-2.0-flash-exp which supports vision
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""Analyze this image and extract exactly 6 concise, descriptive tags, a single category, a descriptive title, and a brief description.
 
@@ -182,8 +179,7 @@ async def analyze_video(video_url: str, title: str = ""):
             response.raise_for_status()
             video_data = response.content
         
-        # Use gemini-2.0-flash-exp which supports video analysis
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Create a temporary file
         import tempfile
