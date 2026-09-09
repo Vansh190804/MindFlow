@@ -11,7 +11,6 @@ export async function apiRequest(
     "Content-Type": "application/json",
   };
 
-  // Use provided token or get from storage
   const authToken = token || authStorage.getToken();
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
@@ -21,7 +20,7 @@ export async function apiRequest(
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
-    credentials: "include", // Include cookies for OAuth
+    credentials: "include", 
   });
 
   if (!response.ok) {

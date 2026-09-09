@@ -1,8 +1,3 @@
-/**
- * Extension Download Utility
- * Handles downloading the browser extension folder as a zip file
- */
-
 import { authStorage } from './auth';
 import { API_BASE_URL } from './config';
 

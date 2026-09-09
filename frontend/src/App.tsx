@@ -34,7 +34,6 @@ const App = () => (
           <Route path="/dashboard/spaces" element={<ProtectedRoute><Spaces /></ProtectedRoute>} />
           <Route path="/dashboard/items" element={<ProtectedRoute><Items /></ProtectedRoute>} />
           <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -13,7 +13,7 @@ export interface AuthResponse {
   user: User;
 }
 
-// Store auth data in localStorage
+
 export const authStorage = {
   setToken: (token: string) => {
     localStorage.setItem("access_token", token);
@@ -37,15 +37,11 @@ export const authStorage = {
   },
 };
 
-// Initiate Google OAuth login
 export const loginWithGoogle = () => {
-  // Redirect to backend OAuth endpoint
   window.location.href = `${API_BASE_URL}/api/v1/auth/login`;
 };
 
-// Handle OAuth callback (extract token from URL or handle redirect)
 export const handleAuthCallback = (): AuthResponse | null => {
-  // Check if we have auth data in the URL params (if backend redirects with params)
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
   const userStr = params.get("user");
@@ -67,18 +63,16 @@ export const handleAuthCallback = (): AuthResponse | null => {
   return null;
 };
 
-// Logout
 export const logout = () => {
   authStorage.clear();
   window.location.href = "/";
 };
 
-// Get current user
+
 export const getCurrentUser = (): User | null => {
   return authStorage.getUser();
 };
 
-// Check if user is authenticated
 export const isAuthenticated = (): boolean => {
   return authStorage.isAuthenticated();
 };
