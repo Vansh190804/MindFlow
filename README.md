@@ -154,3 +154,16 @@ pytest
 - Zip Extension folder
 - Publish to Chrome Web Store (optional)
 
+
+## CI/CD Pipeline
+
+MindFlow uses GitHub Actions to validate and package the backend automatically.
+
+The workflow runs on pushes and pull requests targeting `main` and performs:
+
+1. Installs Python 3.11 and backend dependencies.
+2. Runs backend tests with `pytest`.
+3. Checks Python code quality with Ruff.
+4. Builds the backend Docker image.
+5. On successful pushes to `main`, publishes the image to GitHub Container Registry:
+
