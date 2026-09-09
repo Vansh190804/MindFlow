@@ -7,6 +7,12 @@ from app.core.config import settings
 
 app = FastAPI(title="MindFlow API", redirect_slashes=False)
 
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
 # Add session middleware for OAuth (required by Authlib)
 app.add_middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)
 
