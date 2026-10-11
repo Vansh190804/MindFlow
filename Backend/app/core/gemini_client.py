@@ -19,7 +19,7 @@ T = TypeVar("T")
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 
-async def create_embedding(text: str):
+async def create_embedding(text: str, task_type: str = "retrieval_document"):
     """
     Create embeddings using Gemini's supported embedding model
     """
@@ -28,7 +28,7 @@ async def create_embedding(text: str):
             lambda: genai.embed_content(
                 model="models/gemini-embedding-001",
                 content=text,
-                task_type="retrieval_document"
+                task_type=task_type
             )
         )
         return result['embedding']

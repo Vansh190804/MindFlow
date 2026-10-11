@@ -521,11 +521,14 @@ const DashboardLayout = ({ children, onItemAdded }: DashboardLayoutProps) => {
 
         {/* Search Results Overlay */}
         {searchActive && searchQuery && (
-          <div className="fixed inset-0 z-50 pointer-events-auto">
+          <div className="fixed inset-0 z-50 pointer-events-auto" onClick={closeSearch}>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeSearch} />
             <div className="relative h-full w-full overflow-y-auto pt-32 sm:pt-28 lg:pt-24 px-4 sm:px-6">
               <div className="mx-auto max-w-6xl">
-                <div className="bg-background/95 rounded-lg shadow-2xl border border-border/30 overflow-hidden">
+                <div
+                  className="bg-background/95 rounded-lg shadow-2xl border border-border/30 overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="p-4">
                   {searchLoading ? (
                     <div className="text-center py-8 text-muted-foreground">Searching...</div>
