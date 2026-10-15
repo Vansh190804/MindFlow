@@ -7,7 +7,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!isAuthenticated()) {
-    // Redirect to login if not authenticated
     return <Navigate to="/auth/login" replace />;
   }
 

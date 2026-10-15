@@ -189,7 +189,6 @@ async def auth_callback(request: Request):
 
 @router.post('/logout')
 async def logout(request: Request):
-    """Clear server-side session (useful for OAuth flow). Frontend should also clear local storage."""
     try:
         request.session.clear()
     except Exception:

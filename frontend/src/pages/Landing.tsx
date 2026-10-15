@@ -9,9 +9,7 @@ const Landing = () => {
 
   return (
   <div className="relative min-h-screen overflow-hidden text-foreground bg-gradient-to-b from-[#0a0f1f] via-[#0a0d17] to-[#05070d]">
-      {/* Background FX layers: gradient glow, dotted grid, orbital curves, drifting orbs */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-10">
-        {/* Soft radial glow from top-right blending purple → blue (ambient neon through mist) */}
         <div
           className="absolute -top-[22%] -right-[12%] w-[78vw] h-[78vw] blur-3xl opacity-80"
           style={{
@@ -20,7 +18,6 @@ const Landing = () => {
             filter: "saturate(115%)",
           }}
         />
-        {/* Additional diffused blue ambient light */}
         <div
           className="absolute -top-[10%] right-[10%] w-[55vw] h-[55vw] blur-3xl opacity-100"
           style={{
@@ -29,7 +26,6 @@ const Landing = () => {
           }}
         />
 
-        {/* Dotted grid pattern with slow drift to evoke structured intelligence */}
         <div
           className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
           style={{
@@ -40,7 +36,7 @@ const Landing = () => {
           }}
         />
 
-        {/* Orbital curves (subtle strokes) rotating slowly */}
+
         <svg
           className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] opacity-[0.04] blur-[0.2px]"
           style={{ animation: "orbitRotate 30s linear infinite" }}
@@ -64,7 +60,6 @@ const Landing = () => {
           </g>
         </svg>
 
-        {/* Drifting glow orbs for a living interface feel */}
         {[
           { cls: "top-[18%] right-[18%]", size: 240, hue: "rgba(96,165,250,0.10)", delay: 0, dur: 20 },
           { cls: "bottom-[14%] left-[15%]", size: 220, hue: "rgba(167,139,250,0.10)", delay: 0, dur: 22 },
@@ -86,7 +81,7 @@ const Landing = () => {
           />
         ))}
       </div>
-      {/* Header */}
+    
   <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-2">
@@ -105,12 +100,12 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
+    
       <section className="relative px-4 pt-28 pb-20 sm:px-6 lg:pt-32">
-        {/* Glass panel behind hero for legibility */}
+   
         <div className="absolute inset-x-4 top-24 flex justify-center -z-10 sm:inset-x-6">
           <div className="relative h-[min(420px,70vh)] w-[min(1100px,92vw)] sm:h-[min(440px,70vh)]">
-            {/* Distant star-like glow behind the glass */}
+        
             <div
               className="absolute -inset-10 rounded-[36px] blur-3xl opacity-70 animate-starPulse"
               style={{
@@ -118,14 +113,14 @@ const Landing = () => {
                   "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 60%)",
               }}
             />
-            {/* Frosted glass surface with faint border */}
+        
             <div className="absolute inset-0 rounded-[28px] bg-white/5 backdrop-blur-2xl border border-white/12 shadow-[0_10px_60px_rgba(2,6,23,0.6)]" />
-            {/* Subtle outer ring to enhance layered depth */}
+           
             <div className="absolute inset-0 rounded-[28px] ring-1 ring-white/10" />
           </div>
         </div>
         <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
-          {/* Badge */}
+    
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -136,7 +131,7 @@ const Landing = () => {
             <span className="text-sm text-primary">Your personal digital brain</span>
           </motion.div>
 
-          {/* Headline */}
+         
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -146,7 +141,6 @@ const Landing = () => {
             Collect. Think. Create.
           </motion.h1>
 
-          {/* Content Type Pills */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -173,7 +167,7 @@ const Landing = () => {
             ))}
           </motion.div>
 
-          {/* Subheadline */}
+       
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -184,7 +178,7 @@ const Landing = () => {
             instantly with smart search — minimal, fast, and thoughtful.
           </motion.p>
 
-          {/* CTA Buttons */}
+         
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -210,11 +204,10 @@ const Landing = () => {
 
         </div>
 
-        {/* Subtle neon accent edge */}
+  
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-[calc(24rem+48px)] w-[min(1000px,88vw)] h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent blur-[1px]" />
       </section>
 
-      {/* Features Section */}
       <section className="px-4 py-20 sm:px-6">
         <div className="mx-auto w-full max-w-6xl">
           <motion.h2 
@@ -323,7 +316,7 @@ const Landing = () => {
                 }}
                 className={`relative p-8 rounded-3xl bg-gradient-to-br ${feature.gradient} border border-border/50 hover:border-primary/40 transition-all duration-300 overflow-hidden group cursor-pointer`}
               >
-                {/* Glow effect on hover */}
+             
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 blur-xl" />
                 </div>
@@ -343,7 +336,7 @@ const Landing = () => {
                   </p>
                 </div>
 
-                {/* Decorative corner element */}
+                
                 <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500" />
               </motion.div>
             ))}
@@ -351,7 +344,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="px-4 py-12 sm:px-6">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:items-center sm:text-left">
           <div className="flex items-center gap-2">
@@ -362,7 +354,7 @@ const Landing = () => {
         </div>
       </footer>
 
-      {/* Local styles for animations and background effects */}
+     
       <style>
         {`
         @keyframes drift {

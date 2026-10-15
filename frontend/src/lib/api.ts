@@ -48,7 +48,6 @@ export async function apiRequest(
     }
 
     if (response.status === 401 && authToken) {
-      // Token-based request failed; treat as expired session
       authStorage.clear();
       window.location.href = "/auth/login";
       throw new Error("Session expired. Please sign in again.");

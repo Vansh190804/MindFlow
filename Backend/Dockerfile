@@ -6,7 +6,6 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Install system dependencies required by psycopg2, Pillow, etc.
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		build-essential \

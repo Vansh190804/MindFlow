@@ -18,7 +18,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Redirect if already authenticated
+
   useEffect(() => {
     if (isAuthenticated()) {
       navigate("/dashboard");
@@ -26,7 +26,6 @@ const SignIn = () => {
   }, [navigate]);
 
   const handleGoogleSignIn = () => {
-    // Redirect to backend Google OAuth
     loginWithGoogle();
   };
 
@@ -62,9 +61,9 @@ const SignIn = () => {
                  bg-gradient-to-b from-[#0a0f1f] via-[#0a0d17] to-[#05070d]"
       style={{ fontFamily: 'Inter, "Space Grotesk", Satoshi, ui-sans-serif, system-ui, -apple-system' }}
     >
-      {/* Ambient background: soft purple-blue radial edges, subtle grid, drifting orbs */}
+     
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        {/* Main ambient glow (top-right) */}
+        
         <div
           className="absolute -top-[22%] -right-[12%] w-[78vw] h-[78vw] blur-3xl opacity-80"
           style={{
@@ -73,7 +72,7 @@ const SignIn = () => {
             filter: 'saturate(115%)',
           }}
         />
-        {/* Secondary diffused blue */}
+      
         <div
           className="absolute -top-[8%] right-[8%] w-[55vw] h-[55vw] blur-3xl opacity-70"
           style={{
@@ -81,7 +80,7 @@ const SignIn = () => {
               'radial-gradient(closest-side, rgba(96,165,250,0.10) 0%, rgba(96,165,250,0.06) 40%, transparent 70%)',
           }}
         />
-        {/* Dotted grid (very subtle) */}
+    
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
           style={{
@@ -91,7 +90,7 @@ const SignIn = () => {
             animation: 'gridShift 80s linear infinite',
           }}
         />
-        {/* Drifting orbs */}
+      
         {[
           { cls: 'top-[18%] right-[22%]', size: 240, hue: 'rgba(96,165,250,0.08)', delay: 0, dur: 20 },
           { cls: 'bottom-[18%] left-[18%]', size: 220, hue: 'rgba(167,139,250,0.08)', delay: 6, dur: 22 },
@@ -109,7 +108,7 @@ const SignIn = () => {
           />
         ))}
       </div>
-      {/* Header */}
+     
       <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -126,26 +125,26 @@ const SignIn = () => {
         </div>
       </header>
 
-      {/* Sign In Form */}
+   
       <div className="relative z-10 w-full max-w-md">
         <div className="relative p-12 rounded-[32px] border border-white/12 bg-white/10 backdrop-blur-2xl text-white
                         shadow-[0_10px_60px_rgba(2,6,23,0.6)] overflow-hidden opacity-0 scale-95 animate-[mf-pop_320ms_ease-out_forwards]">
-          {/* subtle gradient edges */}
+         
           <div className="pointer-events-none absolute inset-0 rounded-[32px] ring-1 ring-white/10" />
           <div className="pointer-events-none absolute inset-0 rounded-[32px]"
                style={{ background: 'radial-gradient(60% 60% at 0% 0%, rgba(139,92,246,0.18), transparent 60%), radial-gradient(50% 60% at 100% 100%, rgba(79,70,229,0.18), transparent 60%)' }} />
-          {/* Icon */}
+        
           <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
             <Brain className="w-8 h-8 text-primary" />
           </div>
 
-          {/* Heading */}
+      
           <h1 className="text-3xl font-bold text-center mb-2">Create your account</h1>
           <p className="text-center text-muted-foreground mb-8">
             Start capturing everything you care about in one intelligent space.
           </p>
 
-          {/* Google Sign In */}
+         
           <Button
             size="lg"
             className="w-full mb-4 relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 text-white
@@ -169,7 +168,7 @@ const SignIn = () => {
             </div>
           </div>
 
-          {/* Email Input */}
+
           <div className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
@@ -264,7 +263,7 @@ const SignIn = () => {
         </div>
       </div>
 
-      {/* Local styles for subtle motion and ripple */}
+
       <style>{`
         @keyframes mf-pop { 0% { opacity: 0; transform: scale(.95); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes mf-ripple { from { opacity: .35; transform: scale(.8); } to { opacity: 0; transform: scale(1.35); } }
