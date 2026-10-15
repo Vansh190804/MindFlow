@@ -122,35 +122,62 @@ MindFlow/
 - Environment variable configuration
 - Chrome extension isolated storage
 
-##  Testing
-
-```sh
-# Frontend tests
-npm run test
-
-# Backend tests
-cd Backend
-pytest
-
-# Extension testing
-# See EXTENSION_TESTING.md for checklist
-```
-
-##  Deployment
-
-### Frontend
-- Deploy to Vercel, Netlify, or any static host
-- Update API URLs for production
+## Testing
 
 ### Backend
-- Deploy to Railway, Render, or AWS
-- Set up production database
-- Configure environment variables
-- Enable HTTPS
 
-### Extension
-- Create proper icons
-- Update URLs to production
-- Zip Extension folder
-- Publish to Chrome Web Store (optional)
+Backend tests and linting run automatically through GitHub Actions whenever code is pushed to main or a pull request targets main.
+
+- **Pytest**: Runs backend tests to validate functionality.
+- **Ruff**: Checks Python code for linting issues.
+- **Docker Build**: Verifies that the backend Docker image can be built successfully.
+
+### To run checks locally:
+
+```sh
+cd Backend
+pytest tests
+ruff check app tests --ignore E712,F401,F541,F811,F841
+docker build -t mindflow-backend .
+```
+
+### Frontend
+
+```sh
+npm run test
+```
+
+## CI/CD & Deployment
+
+MindFlow uses **GitHub Actions, Docker, GitHub Container Registry (GHCR), and Render** to automate backend testing, container image publishing, and production deployment.
+
+### Automated CI/CD Pipeline
+
+Every push to `main` triggers the following workflow:
+
+1. **Checkout:** GitHub Actions checks out the repository.
+2. **Testing:** Runs backend tests using Pytest.
+3. **Linting:** Runs Ruff to check Python code quality.
+4. **Docker Build Validation:** Builds the backend Docker image to verify that the Docker configuration and image build succeed.
+5. **Image Publishing:** After the CI job succeeds, GitHub Actions builds the backend image and pushes it to GitHub Container Registry (GHCR).
+6. **Automatic Deployment:** GitHub Actions calls the Render deploy hook, triggering the deployment of the newly published image.
+
+Pull requests targeting `main` run the validation pipeline without publishing a new image or triggering a deployment.
+
+### Backend Deployment
+
+The FastAPI backend is deployed on **Render** using a prebuilt Docker image stored in **GitHub Container Registry (GHCR)**.
+
+- **Docker:** Packages the backend application and its dependencies into a portable container image.
+- **GitHub Container Registry (GHCR):** Hosts the published backend image, which Render pulls during deployment.
+- **Render:** Runs the containerized backend and provides the deployed service URL.
+- **GitHub Actions:** Automates testing, linting, image building, publishing, and deployment triggering.
+- **Environment Variables:** Production configuration, database credentials, and API secrets are managed through the deployment environment and GitHub Actions secrets.
+
+When code is pushed to `main`, the workflow validates the backend before publishing a new image. Once the image is successfully pushed to GHCR, the workflow triggers Render through a deploy hook. Render then pulls the updated image and deploys it. This ensures that failed CI checks prevent the publishing and deployment stages from running.
+
+### Frontend Deployment
+
+The frontend is deployed separately from the backend. Its production API configuration points to the deployed Render backend URL, allowing the frontend to communicate with the live API.
+
 
